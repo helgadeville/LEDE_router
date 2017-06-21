@@ -1,9 +1,0 @@
-#!/bin/sh
-# Luci etc.
-echo Now preparing lighttpd
-opkg update
-opkg install lighttpd
-opkg install mod-access mod-alias mod-auth mod-authn_file mod-cgi mod-evasive mod-openssl
-echo Now preparing GUI
-echo TODO
-
