@@ -1,0 +1,7 @@
+#!/bin/sh
+echo VPN deinitializing...
+QSSled="/sys/class/leds/tp-link:green:qss" 
+echo none > $QSSled/trigger
+echo timer > $QSSled/trigger
+echo 700 > $QSSled/delay_on
+echo 400 > $QSSled/delay_off

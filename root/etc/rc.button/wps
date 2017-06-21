@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+case "$ACTION" in
+released)
+	if [ "$SEEN" -lt 3 ]
+	then
+		/sbin/vpnonoff
+	elif [ "$SEEN" -gt 3 ]
+	then
+		/sbin/wifionoff
+	fi
+;;
+esac
+
+return 0

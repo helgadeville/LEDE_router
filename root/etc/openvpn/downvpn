@@ -1,0 +1,12 @@
+#!/bin/sh
+echo VPN stopping...
+STARTING=`pgrep startingvpn`
+if [ -n "$STARTING" ]; then
+  /etc/openvpn/errorvpn
+  exit 0
+fi
+killall startingvpn 2> /dev/null
+killall errorvpn 2> /dev/null
+QSSled="/sys/class/leds/tp-link:green:qss"
+echo none > $QSSled/trigger
+echo 0 > $QSSled/brightness

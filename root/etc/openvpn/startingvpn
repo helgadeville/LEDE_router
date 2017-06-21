@@ -1,0 +1,9 @@
+#!/bin/sh
+echo VPN initializing...
+QSSled="/sys/class/leds/tp-link:green:qss" 
+echo none > $QSSled/trigger
+echo timer > $QSSled/trigger
+echo 700 > $QSSled/delay_on
+echo 400 > $QSSled/delay_off
+sleep 60
+/etc/openvpn/errorvpn

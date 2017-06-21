@@ -1,0 +1,10 @@
+--- openvpn	2017-06-20 16:04:13.931633841 +0000
++++ openvpn.patched	2017-06-20 16:11:20.163664848 +0000
+@@ -67,6 +67,7 @@
+ 		--cd "$dir" \
+ 		--config "$conf"
+ 	procd_set_param file "$dir/$conf"
++	procd_set_param term_timeout 15
+ 	procd_set_param respawn
+ 	procd_append_param respawn 3600
+ 	procd_append_param respawn 5

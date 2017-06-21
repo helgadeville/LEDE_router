@@ -1,0 +1,10 @@
+#!/bin/sh
+echo VPN initializing...
+QSSled="/sys/class/leds/tp-link:green:qss" 
+echo none > $QSSled/trigger
+echo timer > $QSSled/trigger
+echo 120 > $QSSled/delay_on
+echo 120 > $QSSled/delay_off
+sleep 60
+echo none > $QSSled/trigger
+echo 0 > $QSSled/brightness

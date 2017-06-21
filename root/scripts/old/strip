@@ -1,0 +1,12 @@
+#!/bin/sh
+if [ -z "$1" ]
+  then
+    echo No input
+    exit 1
+fi
+if [ -z "$2" ]
+  then
+    tr -d '\015' < $1
+  else
+    tr -d '\015' < $1 > $2
+fi

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+IFACE=$(uci -q get wireless.@wifi-iface[0])
+[ -z $IFACE ] && exit
+
+W=$(iwconfig 2>&1 | grep -v 'wireless' | sed '/^$/d;s/"//g')
+if [ -z "$W" ]; then
+  wifi up
+ else
+  wifi down
+fi
+
+exit 0
+

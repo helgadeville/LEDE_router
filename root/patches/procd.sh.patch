@@ -1,0 +1,11 @@
+--- procd.sh.orig	2017-06-20 15:49:14.876453705 +0000
++++ procd.sh	2017-06-20 15:49:32.007149356 +0000
+@@ -213,7 +213,7 @@
+ 			json_add_string "" "$@"
+ 			json_close_array
+ 		;;
+-		nice)
++		nice|term_timeout)
+ 			json_add_int "$type" "$1"
+ 		;;
+ 		reload_signal)
