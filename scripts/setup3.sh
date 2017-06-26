@@ -16,16 +16,20 @@ service netwait enable
 service dnsmasq restart
 service named restart
 # setup VPN
+echo Removing shitty examples
+uci del openvpn.sample_server
+uci del openvpn.sample_client
+uci del openvpn.custom_config
 echo New OpenVPN instance
 # a new OpenVPN instance:
-uci set openvpn.vypr=openvpn
-uci set openvpn.vypr.enabled='1'
-uci set openvpn.vypr.config='/etc/openvpn/vypr.conf'
+uci set openvpn.vpn=openvpn
+uci set openvpn.vpn.enabled='1'
+uci set openvpn.vpn.config='/etc/openvpn/vpn.conf'
 echo New network interface
 # a new network interface for tun:
-uci set network.vyprvpn=interface
-uci set network.vyprvpn.proto='none' #dhcp #none
-uci set network.vyprvpn.ifname='tun0'
+uci set network.vpn=interface
+uci set network.vpn.proto='none' #dhcp #none
+uci set network.vpn.ifname='tun0'
 echo New Firewall zone
 # a new firewall zone (for VPN):
 uci add firewall zone
@@ -35,7 +39,7 @@ uci set firewall.@zone[-1].output='ACCEPT'
 uci set firewall.@zone[-1].forward='REJECT'
 uci set firewall.@zone[-1].masq='1'
 uci set firewall.@zone[-1].mtu_fix='1'
-uci add_list firewall.@zone[-1].network='vyprvpn'
+uci add_list firewall.@zone[-1].network='vpn'
 echo Enable forwarding
 # enable forwarding from LAN to VPN:
 uci add firewall forwarding

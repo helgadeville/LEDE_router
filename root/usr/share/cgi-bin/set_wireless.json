@@ -1,0 +1,19 @@
+#!/bin/sh
+# include POST/GET READER
+. /usr/share/cgi-bin/request
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+# check arguments
+if [ -z "$device" -o -z "$iface" -o -z "$ssid" -o -z "$channel" -o -z "$disabled" ] \
+ || [ ${#key} -lt 8 -a "$disabled" == "0" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  exit 1
+fi
+sudo /usr/share/cgi-bin/_set_wireless.sh $device $iface $ssid $key $channel $disabled > /dev/null 2>&1
+if [ $? -gt 0 ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
+ else
+  echo "{\"status\":\"0\",\"message\":\"OK\"}"
+fi

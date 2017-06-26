@@ -1,0 +1,39 @@
+#!/bin/sh
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+SYSTEM=`cat /proc/cpuinfo | grep "system type" | sed 's/^[^:]*:[ ]*//'`
+MACHINE=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*//'`
+CPU=`cat /proc/cpuinfo | grep "cpu model" | sed 's/^[^:]*:[ ]*//'`
+UP=`uptime`
+DATE=`date`
+INTERNET=`sudo /usr/share/cgi-bin/_internet.sh`
+WIFI=`uci show wireless | grep "disabled.*0"`
+if [ -z "$WIFI" ];
+ then
+  WIFI=disabled
+ else
+  WIFI=enabled
+fi
+# FIXME !
+WORKMODE="wired access-point"
+VTUN=`ifconfig | grep tun`
+OVPN=`pgrep openvpn`
+VSTART=`pgrep startingvpn`
+VSTOP=`pgrep stoppingvpn`
+VERR=`pgrep errorvpn`
+if [ -n "$VSTART" -o -n "$VSTOP" -o -n "$VERR" ];
+ then
+  [ -n "$VSTART" ] && VPN=starting
+  [ -n "$VSTOP" ] && VPN=stopping
+  [ -n "$VSTART" -a -n "$VSTOP" ] && VPN=error
+  [ -n "$VERR" ] && VPN=error
+ else
+  if [ -n "$OVPN" -a -n "$TUN" ];
+   then
+    VPN=up
+   else
+    VPN=down
+    [ -n "$OVPN" -o -n "$TUN" ] && VPN=error
+  fi
+fi
+echo "{\"system\":\"$SYSTEM\",\"machine\":\"$MACHINE\",\"cpu\":\"$CPU\",\"up\":\"$UP\",\"date\":\"$DATE\",\"internet\":\"$INTERNET\",\"wireless\":\"$WIFI\",\"workmode\":\"$WORKMODE\",\"VPN\":\"$VPN\"}"

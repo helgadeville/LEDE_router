@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+USR=`grep ":www:" /etc/lighttpd/.htdigest | head -1 | cut -d":" -f1`
+echo "{\"name\":\"$USR\"}"

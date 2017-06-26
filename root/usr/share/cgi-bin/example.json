@@ -1,0 +1,2 @@
+#!/bin/sh
+sudo /usr/share/cgi-bin/_example.sh

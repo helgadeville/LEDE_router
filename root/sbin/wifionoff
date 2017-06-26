@@ -1,14 +1,15 @@
 #!/bin/sh
+DIS=`uci show wireless | grep "disabled.*1" | sed 's/wireless\.//' | sed 's/\.disabled.*//'`
+ENA=`uci show wireless | grep "disabled.*0" | sed 's/wireless\.//' | sed 's/\.disabled.*//'`
 
-IFACE=$(uci -q get wireless.@wifi-iface[0])
-[ -z $IFACE ] && exit
+for dev in $DIS;
+do
+ uci set wireless.$dev.disabled=0 ;
+done
+for dev in $ENA;
+do
+ uci set wireless.$dev.disabled=1 ;
+done
+uci commit
 
-W=$(iwconfig 2>&1 | grep -v 'wireless' | sed '/^$/d;s/"//g')
-if [ -z "$W" ]; then
-  wifi up
- else
-  wifi down
-fi
-
-exit 0
-
+/etc/init.d/network reload

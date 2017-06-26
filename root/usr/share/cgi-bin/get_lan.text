@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "Content-Type: text/plain; charset=utf-8"
+echo ""
+uci show network.lan | sed 's/^network\.//'
+uci show dhcp.lan | sed 's/^dhcp\.lan/dhcp-lan/'
