@@ -2,3 +2,13 @@
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
 uci show wireless | sed 's/^wireless\.//'
+RD=`uci show wireless | grep 'wifi-device' | sed 's/wireless\.//' | sed 's/=wifi-device//'`
+for radio in $RD
+ do
+  PHY=`echo $radio | sed 's/radio/phy/'` ;
+  DP=`iw phy phy0 channels | grep -v disabled | grep -o '\[.*\]' | tr -d '[]' |sed 's/$/,/'`
+  DP=`echo $DP | sed 's/ //g; s/,$//'` ;
+  echo $radio.device=\'$PHY\' ;
+  echo $radio.channels=\'$DP\' ;
+done
+

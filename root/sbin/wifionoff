@@ -12,4 +12,11 @@ do
 done
 uci commit
 
-/etc/init.d/network reload
+for dev in $DIS;
+do
+ wifi up $dev ;
+done
+for dev in $ENA;
+do
+ wifi down $dev ;
+done

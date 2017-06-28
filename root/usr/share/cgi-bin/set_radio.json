@@ -4,12 +4,12 @@
 echo "Content-Type: application/json; charset=utf-8"
 echo ""
 # check arguments
-if [ -z "$device" -o -z "$iface" -o -z "$disabled" ];
+if [ -z "$device" -o -z "$disabled" ];
  then
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
-sudo /usr/share/cgi-bin/_set_wireless.sh $device $iface $disabled SSID="$ssid" KEY="$key" > /dev/null 2>&1
+sudo /usr/share/cgi-bin/_set_radio.sh $device $disabled $channel > /dev/null 2>&1
 if [ $? -gt 0 ];
  then
   echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"

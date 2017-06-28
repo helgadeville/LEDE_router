@@ -1,51 +1,71 @@
 #!/bin/sh
-# usage: _set_wireless.sh $device $iface $ssid $key $channel $disabled
+# usage: _set_wireless.sh $device $iface $disabled $ssid $key
 # check parameters
-if [ -z "$1" -o -z "$2" -o -z "$3" -o -z "$5" -o -z "$6" ] \
- || [ ${#4} -lt 8 -a "$disabled" == "0" ];
+device="$1"
+iface="$2"
+disabled="$3"
+P1A=`echo $4 | grep "SSID=" | sed 's/SSID=//'`
+P1B=`echo $5 | grep "SSID=" | sed 's/SSID=//'`
+[ -n "$P1A" ] && ssid="$P1A"
+[ -n "$P1B" ] && ssid="$P1B"
+P2A=`echo $4 | grep "KEY=" | sed 's/KEY=//'`
+P2B=`echo $5 | grep "KEY=" | sed 's/KEY=//'`
+[ -n "$P2A" ] && key="$P2A"
+[ -n "$P2B" ] && key="$P2B"
+#
+if [ -z "$device" -o -z "$iface" -o -z "$disabled" ]
  then
   exit 1
 fi
 #
-uci set wireless.$2.ssid=$3
+uci set wireless.$iface.disabled=$disabled
 if [ $? != 0 ];
  then
   exit 1
 fi
 #
-uci set wireless.$2.key=$4
-if [ $? != 0 ];
+if [ -n "$ssid" ];
  then
-  uci revert wireless.$2.ssid
-  exit 1
+  uci set wireless.$iface.ssid=$ssid
+  if [ $? != 0 ];
+   then
+    uci revert wireless.$iface.disabled
+    exit 1
+  fi
 fi
 #
-uci set wireless.$1.channel=$5
-if [ $? != 0 ];
+if [ -n "$key" ];
  then
-  uci revert wireless.$2.ssid
-  uci revert wireless.$2.key
-  exit 1
+  uci set wireless.$iface.key=$key
+  if [ $? != 0 ];
+   then
+    if [ -n "$ssid" ];
+     then
+      uci revert wireless.$iface.ssid
+    fi
+    uci revert wireless.$iface.disabled
+    exit 1
+  fi
 fi
 #
-uci set wireless.$1.disabled=$6
+uci set wireless.$iface.encryption=psk2
 if [ $? != 0 ];
  then
-  uci revert wireless.$2.ssid
-  uci revert wireless.$2.key
-  uci revert wireless.$1.channel
-  exit 1
-fi
-#
-uci set wireless.$2.encryption=psk2
-if [ $? != 0 ];
- then
-  uci revert wireless.$2.ssid
-  uci revert wireless.$2.key
-  uci revert wireless.$1.channel
-  uci revert wireless.$1.disabled
+  if [ -n "$key" ];
+   then
+    uci revert wireless.$iface.key
+  fi
+  if [ -n "$ssid" ];
+   then
+    uci revert wireless.$iface.ssid
+  fi  
+  uci revert wireless.$iface.disabled
   exit 1
 fi
 uci commit
-/etc/init.d/network reload
-exit 0
+# do something only when radio enabled
+ENA=`uci get wireless.$device.disabled`
+if [ "$ENA" === "0" ];
+ then
+  wifi up $device
+fi
