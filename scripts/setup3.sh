@@ -5,6 +5,7 @@ opkg install bind-server openvpn-openssl nano
 # Prepare files and setup buttons
 cp /root/etc/openvpn/* /etc/openvpn
 cp /root/sbin/* /sbin
+cp /root/etc/rc.local /etc
 mkdir /root/rc.button
 mv /etc/rc.button/rfkill /etc/rc.button/rfkill_old
 cp /root/etc/rc.button/wps /etc/rc.button
@@ -48,6 +49,8 @@ uci set firewall.@forwarding[-1].dest=vpn
 # some defaults
 uci set wireless.default_radio0.encryption=psk2
 uci set wireless.default_radio0.key=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 12`
+# disable wan access to router
+uci set dropbear.@dropbear[0].Interface=lan
 echo Commiting changes
 # Finally, you should commit UCI changes:
 uci commit

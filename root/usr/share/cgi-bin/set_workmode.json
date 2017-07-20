@@ -1,0 +1,53 @@
+#!/bin/sh
+# accepted parameters: $device $ssid $encryption, optional $enable $key $mac
+# include POST/GET READER
+. /usr/share/cgi-bin/request
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+# check device
+if [ -z "$device" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  exit 1
+fi
+# setup - read interfaces
+switch=`swconfig list | sed 's/Found.*-[*[:space:]]//'`
+wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
+# create one line
+wired=`echo $wired`
+wireless=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
+is_wireless=no
+for wifi in $wireless
+ do
+  [ "$wifi" = "$device" ] && is_wireless=yes
+done
+[ "$proto" = "static ] && if [ -z "$ipaddr" -o -z "$netmask" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  exit 1
+fi
+if [ "$is_wireless" = "yes" ];
+ then
+  # wireless, check parameters and call _ap_on.sh
+  if [ -z "$ssid" -o -z "$encryption" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+    exit 1
+  fi
+  if [ "$encryption" != "none" -a -z "$key" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  fi
+  sudo -E /usr/share/cgi-bin/_ap_on.sh > /dev/null 2>&1
+  result=$?
+ else
+  # not wireless, call _ap_off.sh
+  sudo -E /usr/share/cgi-bin/_ap_off.sh > /dev/null 2>&1
+  result=$?
+fi
+if [ $result -gt 0 ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
+ else
+  echo "{\"status\":\"0\",\"message\":\"OK\"}"
+fi

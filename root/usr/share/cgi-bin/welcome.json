@@ -9,6 +9,6 @@ DATE=`date`
 INTERNET=`sudo /usr/share/cgi-bin/_internet.sh`
 WIFI=`sudo /usr/share/cgi-bin/_radios.sh`
 # FIXME !
-WORKMODE="wired access-point"
+WORKMODE=`/usr/share/cgi-gin/get_workmode.sh`
 VPN=`sudo /usr/share/cgi-bin/_vpnstate.sh`
 echo "{\"system\":\"$SYSTEM\",\"machine\":\"$MACHINE\",\"cpu\":\"$CPU\",\"up\":\"$UP\",\"date\":\"$DATE\",\"internet\":\"$INTERNET\",\"wireless\":$WIFI,\"workmode\":\"$WORKMODE\",\"VPN\":\"$VPN\"}"

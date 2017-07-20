@@ -1,0 +1,80 @@
+#!/bin/sh
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+RET="{\"selected\":"
+# get selected device
+WIREDWAN=`uci get network.wan.ifname 2> /dev/null`
+WIREDWAND=`uci get network.wan.disabled 2> /dev/null`
+WIFIWAN=`uci get wireless.wan.device 2> /dev/null`
+WIFIWAND=`uci get wireless.wan.disabled 2> /dev/null`
+if [ -n "$WIREDWAN" -a "$WIREDWAND" != "1" ];
+ then
+  SELECTED="$WIREDWAN"
+ else
+  if [ -n "$WIFIWAN" -a "$WIFIWAND" != "1" ];
+   then
+    SELECTED="$WIFIWAN"
+  fi
+fi
+RET="$RET\"$SELECTED\","
+# get list of ethernet non-switch devices and radio devices
+switch=`swconfig list | sed 's/Found.*-[*[:space:]]//'`
+wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
+wireless=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
+# read networks of ethernet devices
+RET="$RET\"wired\":["
+wired_networks=
+comma=no
+for dev in $wired
+ do
+  if [ "$comma" = "no" ];
+   then
+    comma=yes
+   else
+    RET="$RET,"
+  fi
+  _proto=
+  _ipaddr=
+  _netmask=
+  _macaddr=
+  if [ "$WIREDWAN" = "$dev" ];
+   then
+    _proto=`uci get network.wan.proto 2> /dev/null`
+    _ipaddr=`uci get network.wan.ipaddr 2> /dev/null`
+    _netmask=`uci get network.wan.netmask 2> /dev/null`
+    _macaddr=`uci get network.wan.macaddr 2> /dev/null`
+  fi
+  RET="$RET{\"ifname\":\"$dev\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"mac\":\"$_macaddr\"}"
+done
+RET="$RET],\"wireless\":["
+# read networks of radio devices
+comma=no
+wifi_networks=
+for wifi in $wireless
+ do
+  if [ "$comma" = "no" ];
+   then
+    comma=yes
+   else
+    RET="$RET,"
+  fi
+  _proto=
+  _ipaddr=
+  _netmask=
+  _macaddr=
+  if [ "$WIFIWAN" = "$wifi" ];
+   then
+    _proto=`uci get wireless.wan.proto 2> /dev/null`
+    _ipaddr=`uci get wireless.wan.ipaddr 2> /dev/null`
+    _netmask=`uci get wireless.wan.netmask 2> /dev/null`
+    _macaddr=`uci get wireless.wan.macaddr 2> /dev/null`
+    _ssid=`uci get wireless.wan.ssid 2> /dev/null`
+    _encryption=`uci get wireless.wan.encryption 2> /dev/null`
+    _key=`uci get wireless.wan.key 2> /dev/null`
+    _disabled=`uci get wireless.wan.disabled 2> /dev/null`
+  fi
+  RET="$RET{\"ifname\":\"$wifi\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"mac\":\"$_macaddr\",\"ssid\":\"$_ssid\",\"encryption\":\"$_encryption\",\"key\":\"$_key\",\"disabled\":\"$_disabled\"}"
+done
+#
+RET="$RET]}"
+echo "$RET"

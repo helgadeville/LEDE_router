@@ -1,4 +1,5 @@
 #!/bin/sh
+# usage: scan.text $device
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
-sudo /usr/share/cgi-bin/_scan.sh
+sudo /usr/share/cgi-bin/_scan.sh $device
