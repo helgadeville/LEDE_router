@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "Content-Type: text/plain; charset=utf-8"
+echo ""
+ls /etc/openvpn/configurations/*.ovpn 2> /dev/null | sed -r 's/^.+\///'

@@ -10,12 +10,11 @@ if [ -z "$file" ];
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
-# restore
-sudo -E /usr/share/cgi-bin/_set_system_config.sh
+# remove
+sudo -E /usr/share/cgi-bin/_remove_vpn_config.sh
 if [ $? -gt 0 ];
  then
-  echo "{\"status\":\"1\",\"message\":\"Error on restoring configuration\"}"
+  echo "{\"status\":\"1\",\"message\":\"Error on removing configuration\"}"
  else
-  sudo /usr/share/cgi-bin/_reboot.sh &
   echo "{\"status\":\"0\",\"message\":\"OK\"}"
 fi

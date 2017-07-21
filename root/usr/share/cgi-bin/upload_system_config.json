@@ -4,18 +4,18 @@
 . /usr/share/cgi-bin/request
 echo "Content-Type: application/json; charset=utf-8"
 echo ""
-# check file
-if [ -z "$file" ];
+# check file and data
+if [ -z "$file" -o -z "$data"];
  then
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
 # restore
-sudo -E /usr/share/cgi-bin/_set_system_config.sh
+sudo -E /usr/share/cgi-bin/_upload_system_config.sh
 if [ $? -gt 0 ];
  then
   echo "{\"status\":\"1\",\"message\":\"Error on restoring configuration\"}"
- else
-  sudo /usr/share/cgi-bin/_reboot.sh &
-  echo "{\"status\":\"0\",\"message\":\"OK\"}"
 fi
+# finally, reboot
+sudo /usr/share/cgi-bin/_reboot.sh &
+echo "{\"status\":\"0\",\"message\":\"OK\"}"

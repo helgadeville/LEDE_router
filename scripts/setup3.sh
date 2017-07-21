@@ -3,7 +3,7 @@
 opkg update
 opkg install bind-server openvpn-openssl nano
 # Prepare files and setup buttons
-cp /root/etc/openvpn/* /etc/openvpn
+cp -R /root/etc/openvpn/* /etc/openvpn
 cp /root/sbin/* /sbin
 cp /root/etc/rc.local /etc
 mkdir /root/rc.button

@@ -1,0 +1,23 @@
+#!/bin/sh
+# accepts $current (set current vpn.conf) $original (content) $file (file name)
+# include POST/GET READER
+. /usr/share/cgi-bin/request
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+any=no
+if [ -n "$current" ];
+ then
+  any=yes
+  sudo -E /usr/share/cgi-bin/_set_current_vpn.sh
+fi
+if [ -n "$original" -a -n "$file" ];
+ then
+  any=yes
+  sudo -E /usr/share/cgi-bin/_upload_vpn.sh
+fi
+if [ "$any" = "yes" ];
+ then
+  echo "{\"status\":\"0\",\"message\":\"OK\"}"
+ else
+  echo "{\"status\":\"1\",\"message\":\"Error in parameters\"}"
+fi

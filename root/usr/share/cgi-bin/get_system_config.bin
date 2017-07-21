@@ -4,4 +4,4 @@
 . /usr/share/cgi-bin/request
 echo "Content-Type: application/octet-stream"
 echo ""
-cat "/root/configurations/custom/$file" 2> /dev/null
+sudo -E /usr/share/cgi-bin/_get_system_config.sh

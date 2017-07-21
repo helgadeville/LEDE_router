@@ -24,13 +24,21 @@ mkdir "$TMP"
 cp "$BASE/$file" "$TMP"
 cd "$TMP"
 # unzip and copy all
-tar xzf "$file"
-rm "$file"
-if [ -z "$factory" ];
+tar xzf "$file" 2> /dev/null
+skip=no
+if [ $? -gt 0 ];
  then
-  cp -R etc/* /etc/
- else
-  cp -R * /
+ skip=yes
+fi
+rm "$file"
+if [ "$skip" = "no" ];
+ then
+  if [ -z "$factory" ];
+   then
+    cp -R etc/* /etc/
+   else
+    cp -R * /
+  fi
 fi
 cd /
 rm -rf "$TMP"
