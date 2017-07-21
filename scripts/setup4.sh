@@ -4,7 +4,7 @@ echo Now preparing lighttpd
 opkg update
 opkg install lighttpd
 opkg install lighttpd-mod-access lighttpd-mod-alias lighttpd-mod-auth lighttpd-mod-authn_file lighttpd-mod-cgi lighttpd-mod-evasive
-opkg install coreutils-base64 openssl-util
+opkg install coreutils-base64 openssl-util curl
 echo Now preparing GUI
 rmdir /etc/lighttpd/conf.d
 cp /root/etc/lighttpd/lighttpd.conf /etc/lighttpd
@@ -13,7 +13,14 @@ mkdir -p /usr/share/cgi-bin
 cp /root/usr/share/cgi-bin/* /usr/share/cgi-bin
 # since no immediate change, no need to restart network
 # install WWW
-echo TODO WWW
+mkdir /tmp/export
+cp /root/export.tgz /tmp/export
+cd /tmp/export
+tar xzf export.tgz
+rm -rf /www/*
+mv export/* /www
+cd /
+rm -rf /tmp/export
 # restart server
 /etc/init.d/lighttpd restart
 # setup configurations
