@@ -1,5 +1,5 @@
 #!/bin/sh
 echo "Content-Type: application/json; charset=utf-8"
 echo ""
-WIFI=`sudo /usr/share/cgi-bin/_radios.sh`
+WIFI=`sudo /usr/share/cgi-bin/_radios.sh 2> /dev/null`
 echo "$WIFI"

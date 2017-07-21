@@ -38,11 +38,11 @@ if [ "$is_wireless" = "yes" ];
    then
     echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   fi
-  sudo -E /usr/share/cgi-bin/_ap_on.sh > /dev/null 2>&1
+  wired="$wired" switch="$switch" device="$device" ssid="$ssid" encryption="$encryption" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" key="$key" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_on.sh > /dev/null 2>&1
   result=$?
  else
   # not wireless, call _ap_off.sh
-  sudo -E /usr/share/cgi-bin/_ap_off.sh > /dev/null 2>&1
+  wired="$wired" switch="$switch" device="$device" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_off.sh > /dev/null 2>&1
   result=$?
 fi
 if [ $result -gt 0 ];

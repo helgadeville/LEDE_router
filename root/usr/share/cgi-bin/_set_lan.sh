@@ -3,7 +3,7 @@
 # check parameters
 
 DHCPIFACE=`uci show dhcp.lan.interface | sed "s/dhcp\.lan\.interface=//g" | sed "s/\'//g"`
-if [ "$DHCPIFACE" == "$1" ];
+if [ "$DHCPIFACE" = "$1" ];
  then
   USE_DHCP=1
 fi

@@ -8,12 +8,12 @@ any=no
 if [ -n "$current" ];
  then
   any=yes
-  sudo -E /usr/share/cgi-bin/_set_current_vpn.sh
+  current="$current" sudo -E /usr/share/cgi-bin/_set_current_vpn.sh > /dev/null 2>&1
 fi
 if [ -n "$original" -a -n "$file" ];
  then
   any=yes
-  sudo -E /usr/share/cgi-bin/_upload_vpn.sh
+  original="$original" file="$file" sudo -E /usr/share/cgi-bin/_upload_vpn.sh > /dev/null 2>&1
 fi
 if [ "$any" = "yes" ];
  then

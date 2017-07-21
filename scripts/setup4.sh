@@ -7,6 +7,7 @@ opkg install lighttpd-mod-access lighttpd-mod-alias lighttpd-mod-auth lighttpd-m
 opkg install coreutils-base64 openssl-util curl
 echo Now preparing GUI
 rmdir /etc/lighttpd/conf.d
+cp /root/etc/sudoers.d/http /etc/sudoers.d
 cp /root/etc/lighttpd/lighttpd.conf /etc/lighttpd
 cp /root/etc/lighttpd/.htdigest /etc/lighttpd
 mkdir -p /usr/share/cgi-bin

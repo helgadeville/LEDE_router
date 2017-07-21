@@ -1,8 +1,8 @@
 #!/bin/sh
 # usage: /usr/share/cgi-bin/_ap_on.sh 
 # $wired $switch $device $ssid $encryption $proto must be set
-# when $proto===static then also ipaddr and netmask must be set
-# $key and $mac are optional, also $enable is optional
+# when $proto=static then also ipaddr and netmask must be set
+# $key and $mac are optional
 # eth1 assumed to be blue "generic" WAN port, so "$wired" will be eth1 by default
 # eth0 is the multiport LAN switch, so "$switch" will be eth0 by default
 # check parameters
@@ -37,7 +37,7 @@ if [ "$proto" = "static"];
 fi
 uci set wireless.wan.ssid="$ssid"
 uci set wireless.wan.encryption="$encryption"
-if [ "$encryption" == "none" ];
+if [ "$encryption" = "none" ];
  then
   uci del wireless.wan.key 2> /dev/null
  else

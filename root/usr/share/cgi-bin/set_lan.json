@@ -6,8 +6,8 @@ echo ""
 # check arguments
 DHCPIFACE=`uci show dhcp.lan.interface | sed "s/dhcp\.lan\.interface=//g" | sed "s/\'//g"`
 if [ -z "$lan" -o -z "$ip" -o -z "$mask" ] \
- || [ "$DHCPIFACE" == "$lan" -a -z "$dhcp_start" ] \
- || [ "$DHCPIFACE" == "$lan" -a -z "$dhcp_limit" ];
+ || [ "$DHCPIFACE" = "$lan" -a -z "$dhcp_start" ] \
+ || [ "$DHCPIFACE" = "$lan" -a -z "$dhcp_limit" ];
  then
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1

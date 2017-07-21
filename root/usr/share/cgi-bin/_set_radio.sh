@@ -15,7 +15,7 @@ fi
 #
 uci commit
 #
-if [ "$2" === "0" ];
+if [ "$2" = "0" ];
  then
   wifi up $1
  else

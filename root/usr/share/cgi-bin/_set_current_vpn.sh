@@ -1,11 +1,11 @@
 #!/bin/sh
-# accepted parameters: $file $factory
+# accepted parameters: $current
 # check file
 if [ -z "$current" ];
  then
   exit 1
 fi
-VPN=`/usr/share/cgi-bin/_vpnstate.sh`
+VPN=`/usr/share/cgi-bin/_vpnstate.sh 2> /dev/null`
 BASE="/etc/openvpn/vpn.conf"
 echo "$current" > "$BASE"
 if [ "$VPN" != "down" ];

@@ -6,9 +6,8 @@ MACHINE=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*//'`
 CPU=`cat /proc/cpuinfo | grep "cpu model" | sed 's/^[^:]*:[ ]*//'`
 UP=`uptime`
 DATE=`date`
-INTERNET=`sudo /usr/share/cgi-bin/_internet.sh`
-WIFI=`sudo /usr/share/cgi-bin/_radios.sh`
-# FIXME !
-WORKMODE=`/usr/share/cgi-bin/get_workmode.sh`
-VPN=`sudo /usr/share/cgi-bin/_vpnstate.sh`
+INTERNET=`sudo /usr/share/cgi-bin/_internet.sh 2> /dev/null`
+WIFI=`sudo /usr/share/cgi-bin/_radios.sh 2> /dev/null`
+WORKMODE=`/usr/share/cgi-bin/get_workmode.sh 2> /dev/null`
+VPN=`sudo /usr/share/cgi-bin/_vpnstate.sh 2> /dev/null`
 echo "{\"system\":\"$SYSTEM\",\"machine\":\"$MACHINE\",\"cpu\":\"$CPU\",\"up\":\"$UP\",\"date\":\"$DATE\",\"internet\":\"$INTERNET\",\"wireless\":$WIFI,\"workmode\":\"$WORKMODE\",\"VPN\":\"$VPN\"}"

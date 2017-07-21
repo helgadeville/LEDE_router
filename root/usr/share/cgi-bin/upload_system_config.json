@@ -1,5 +1,5 @@
 #!/bin/sh
-# accepted parameters: $file
+# accepted parameters: $file $data $archive
 # include POST/GET READER
 . /usr/share/cgi-bin/request
 echo "Content-Type: application/json; charset=utf-8"
@@ -11,11 +11,11 @@ if [ -z "$file" -o -z "$data"];
   exit 1
 fi
 # restore
-sudo -E /usr/share/cgi-bin/_upload_system_config.sh
+file="$file" data="$data" archive="$archive" sudo -E /usr/share/cgi-bin/_upload_system_config.sh > /dev/null 2>&1
 if [ $? -gt 0 ];
  then
-  echo "{\"status\":\"1\",\"message\":\"Error on restoring configuration\"}"
+  echo "{\"status\":\"1\",\"message\":\"Error on uploading configuration\"}"
 fi
 # finally, reboot
-sudo /usr/share/cgi-bin/_reboot.sh &
+sudo /usr/share/cgi-bin/_reboot.sh & > /dev/null 2>&1
 echo "{\"status\":\"0\",\"message\":\"OK\"}"

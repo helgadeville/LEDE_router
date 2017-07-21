@@ -11,7 +11,7 @@ if [ -z "$file" ];
   exit 1
 fi
 # remove
-sudo -E /usr/share/cgi-bin/_remove_system_config.sh
+file="$file" sudo -E /usr/share/cgi-bin/_remove_system_config.sh > /dev/null 2>&1
 if [ $? -gt 0 ];
  then
   echo "{\"status\":\"1\",\"message\":\"Error on removing configuration\"}"

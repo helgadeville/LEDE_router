@@ -1,5 +1,5 @@
 #!/bin/sh
-# accepted parameters: $file $factory
+# accepted parameters: $file
 # check file
 if [ -z "$file" ];
  then
