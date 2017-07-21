@@ -1,4 +1,4 @@
 #!/bin/sh
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
-cat /etc/openvpn/vpn.conf 2> /dev/null
+sudo /usr/share/cgi-bin/_get_vpn_config.sh

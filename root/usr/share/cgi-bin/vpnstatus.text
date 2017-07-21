@@ -1,5 +1,5 @@
 #!/bin/sh
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
-/usr/share/cgi-bin/_vpnstate.sh
+sudo /usr/share/cgi-bin/_vpnstate.sh
 cat /var/log/openvpn-status.log 2> /dev/null
