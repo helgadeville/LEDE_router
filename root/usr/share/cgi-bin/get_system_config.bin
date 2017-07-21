@@ -2,6 +2,8 @@
 # accepted parameter: $file
 # include POST/GET READER
 . /usr/share/cgi-bin/request
-echo "Content-Type: application/octet-stream"
+echo "Content-type: application/octet-stream"
+echo "Content-Transfer-Encoding: binary"
+echo "Content-Disposition: attachment; filename=$file"
 echo ""
 file="$file" sudo -E /usr/share/cgi-bin/_get_system_config.sh 2> /dev/null
