@@ -1,5 +1,5 @@
 #!/bin/sh
-# accepted parameters: $device $ssid $encryption, optional $enable $key $mac
+# accepted parameters: $device $ssid $encryption $proto, optional $enable $key $mac
 # include POST/GET READER
 . /usr/share/cgi-bin/request
 echo "Content-Type: application/json; charset=utf-8"
@@ -21,7 +21,11 @@ for wifi in $wireless
  do
   [ "$wifi" = "$device" ] && is_wireless=yes
 done
-[ "$proto" = "static ] && if [ -z "$ipaddr" -o -z "$netmask" ];
+if [ -n "$proto" -a "$proto" != "dhcp" -a "$proto" != "static" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Bad proto value\"}"
+fi
+[ "$proto" = "static" ] && if [ -z "$ipaddr" -o -z "$netmask" ];
  then
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
@@ -50,4 +54,5 @@ if [ $result -gt 0 ];
   echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
  else
   echo "{\"status\":\"0\",\"message\":\"OK\"}"
+  sudo /usr/share/cgi-bin/_restart.sh &
 fi
