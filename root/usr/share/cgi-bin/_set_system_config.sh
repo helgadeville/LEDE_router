@@ -6,15 +6,15 @@ if [ -z "$file" ];
   exit 1
 fi
 BASE="/root/configurations"
+[ "$file" = "factory" ] && factory=yes
 if [ "$file" != "default" -a "$file" != "factory" ];
  then
   BASE="$BASE/custom"
-fi
-[ "$file" = "factory" ] && factory=yes
-file="$file.cgz"
-if [ -f "$BASE/$file" ];
- then
  else
+  file="$file.cgz"
+fi
+if [ ! -f "$BASE/$file" ];
+ then
   exit 1
 fi
 # prepare tmp directory
@@ -24,8 +24,8 @@ mkdir "$TMP"
 cp "$BASE/$file" "$TMP"
 cd "$TMP"
 # unzip and copy all
-tar xzf "$file" 2> /dev/null
 skip=no
+tar xzf "$file" 2> /dev/null
 if [ $? -gt 0 ];
  then
  skip=yes
@@ -42,3 +42,4 @@ if [ "$skip" = "no" ];
 fi
 cd /
 rm -rf "$TMP"
+[ "$skip" = "yes" ] && exit 1

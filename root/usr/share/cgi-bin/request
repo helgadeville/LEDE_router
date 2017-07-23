@@ -6,9 +6,9 @@ function cgi_get_POST_vars()
 {
     # check content type
     # FIXME: not sure if we could handle uploads with this..
-    [ "${CONTENT_TYPE}" != "application/x-www-form-urlencoded" ] && \
-	logger "Warning: you should probably use MIME type "\
-	     "application/x-www-form-urlencoded! ($SCRIPT_NAME)" 1>&2
+    #[ "${CONTENT_TYPE}" != "application/x-www-form-urlencoded" ] && \
+	#logger "Warning: you should probably use MIME type "\
+	#     "application/x-www-form-urlencoded! ($SCRIPT_NAME)" 1>&2
     # save POST variables (only first time this is called)
     [ -z "$QUERY_STRING_POST" \
       -a "$REQUEST_METHOD" = "POST" -a ! -z "$CONTENT_LENGTH" ] && \
