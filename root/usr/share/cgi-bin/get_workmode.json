@@ -3,6 +3,7 @@ echo "Content-Type: application/json; charset=utf-8"
 echo ""
 RET="{\"selected\":"
 # get selected device
+SELECTED=
 WIREDWAN=`uci get network.wan.ifname 2> /dev/null`
 WIREDWAND=`uci get network.wan.disabled 2> /dev/null`
 WIFIWAN=`uci get wireless.wan.device 2> /dev/null`

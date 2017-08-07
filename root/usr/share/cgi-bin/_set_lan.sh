@@ -24,18 +24,11 @@ if [ -n "$USE_DHCP" ];
 fi
 #
 uci commit
-( sleep 1 ;
-# reload network
-/etc/init.d/network restart > /dev/null 2>&1 && /etc/init.d/netwait start
-# reload DHCP if needed
-[ -n "$USE_DHCP" ] && /etc/init.d/dnsmasq restart
-# those must be rewritten manually
-
+# those services must be rewritten manually
+# named
 sed -n '1h;1!H;${;g;s/listen-on\s*{[^}]*}/listen-on { 127.0.0.1; '"$2"'; }/g;p;}' /etc/bind/named.conf > /etc/bind/_named.conf
 mv /etc/bind/_named.conf /etc/bind/named.conf
-/etc/init.d/named.restart
-
+# lighttpd
 sed -i "/^[[:space:]]*#/!s/server\.bind\s*=.*/server.bind = \""$2"\"/" /etc/lighttpd/lighttpd.conf
-/etc/init.d/lighttpd restart
-
-) &
+# restart network
+lan=yes sudo -E /usr/share/cgi-bin/_restart.sh &

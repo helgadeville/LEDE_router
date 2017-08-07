@@ -11,6 +11,13 @@
 [ "$proto" = "static" ] && [ -z "$ipaddr" -o -z "$netmask" ] && exit 1
 [ "$encryption" != "none" -a "$encryption" != "wep" -a "$encryption" != "psk" -a "$encryption" != "psk2" ] && exit 1
 [ "$encryption" = "none" -a -z "$key" ] && exit 1
+# save station
+echo "encryption=$encryption" > "/root/stations/$ssid"
+[ -n "$key" ] && echo "key=$key" >> "/root/stations/$ssid"
+echo "proto=$proto" >> "/root/stations/$ssid"
+[ -n "$ipaddr" ] && echo "ipaddr=$ipaddr" >> "/root/stations/$ssid"
+[ -n "$netmask" ] && echo "netmask=$netmask" >> "/root/stations/$ssid"
+[ -n "$mac" ]  && echo "mac=$mac" >> "/root/stations/$ssid"
 # according to tutorial :)
 # disable rebind, was 1
 uci set dhcp.@dnsmasq[0].rebind_protection=0

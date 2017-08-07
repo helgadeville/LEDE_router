@@ -10,6 +10,24 @@ if [ -z "$device" ];
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
+# get selected device and check whether wired or not
+SELECTED=
+WIRED=
+WIREDWAN=`uci get network.wan.ifname 2> /dev/null`
+WIREDWAND=`uci get network.wan.disabled 2> /dev/null`
+WIFIWAN=`uci get wireless.wan.device 2> /dev/null`
+WIFIWAND=`uci get wireless.wan.disabled 2> /dev/null`
+if [ -n "$WIREDWAN" -a "$WIREDWAND" != "1" ];
+ then
+  SELECTED="$WIREDWAN"
+  WIRED=yes
+ else
+  if [ -n "$WIFIWAN" -a "$WIFIWAND" != "1" ];
+   then
+    SELECTED="$WIFIWAN"
+    WIRED=no
+  fi
+fi
 # setup - read interfaces
 switch=`swconfig list | sed 's/Found.*-[*[:space:]]//'`
 wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
@@ -30,6 +48,7 @@ fi
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
+CURR_WIRED=
 if [ "$is_wireless" = "yes" ];
  then
   # wireless, check parameters and call _ap_on.sh
@@ -44,15 +63,34 @@ if [ "$is_wireless" = "yes" ];
   fi
   wired="$wired" switch="$switch" device="$device" ssid="$ssid" encryption="$encryption" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" key="$key" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_on.sh > /dev/null 2>&1
   result=$?
+  CURR_WIRED=no
  else
   # not wireless, call _ap_off.sh
   wired="$wired" switch="$switch" device="$device" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_off.sh > /dev/null 2>&1
   result=$?
+  CURR_WIRED=yes
 fi
 if [ $result -gt 0 ];
  then
   echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
  else
-  echo "{\"status\":\"0\",\"message\":\"OK\"}"
-  sudo /usr/share/cgi-bin/_restart.sh &
+  # check reboot options
+  RBT=
+  if [ "$WIRED" = "$CURR_WIRED" ];
+   then
+    # if wired, then just update lan; if wifi, then just update wifi
+    if [ "$CURR_WIRED" = "yes" ];
+     then
+      RBT=cable
+     else
+      RBT=wifi
+    fi
+   else
+    # change from wired to wireless or from wireless to wired - full reboot required
+    RBT=full
+  fi
+  echo "{\"status\":\"0\",\"message\":\"OK\",\"reboot\":\"$RBT\"}"
+  [ "$RBT" = "cable" ] && /etc/init.d/network reload &
+  [ "$RBT" = "wifi" ] && wifi up &
+  [ "$RBT" = "full" ] && sudo /usr/share/cgi-bin/_restart.sh &
 fi

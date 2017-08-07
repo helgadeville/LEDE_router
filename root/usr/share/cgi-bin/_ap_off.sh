@@ -22,6 +22,7 @@ if [ "$proto" = "static" ];
  then
   uci set network.wan.ipaddr="$ipaddr"
   uci set network.wan.netmask="$netmask"
+fi
 if [ "$proto" = "dhcp" ];
  then
   uci del network.wan.ipaddr 2> /dev/null

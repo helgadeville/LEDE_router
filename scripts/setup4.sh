@@ -24,7 +24,8 @@ cd /
 rm -rf /tmp/export
 # restart server
 /etc/init.d/lighttpd restart
-# setup configurations
+# setup configurations and stations
+mkdir /root/stations
 echo "OurHardWorkByTheseWordsGuarded.PleaseDoNotSteal." /root/password
 chmod 400 /root/password
 mkdir /root/configurations

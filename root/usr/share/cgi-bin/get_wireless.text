@@ -6,7 +6,7 @@ RD=`uci show wireless | grep 'wifi-device' | sed 's/wireless\.//' | sed 's/=wifi
 for radio in $RD
  do
   PHY=`echo $radio | sed 's/radio/phy/'` ;
-  DP=`iw phy phy0 channels | grep -v disabled | grep -o '\[.*\]' | tr -d '[]' |sed 's/$/,/'`
+  DP=`iw phy phy0 channels | grep -v disabled | grep -o '\[.*\]' | tr -d '[]' |sed 's/$/,/'` ;
   DP=`echo $DP | sed 's/ //g; s/,$//'` ;
   echo $radio.device=\'$PHY\' ;
   echo $radio.channels=\'$DP\' ;
