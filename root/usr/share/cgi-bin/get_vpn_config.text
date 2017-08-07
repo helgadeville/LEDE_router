@@ -1,4 +1,6 @@
 #!/bin/sh
+# include POST/GET READER
+. /usr/share/cgi-bin/request
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
-sudo /usr/share/cgi-bin/_get_vpn_config.sh 2> /dev/null
+file=$file sudo -E /usr/share/cgi-bin/_get_vpn_config.sh 2> /dev/null
