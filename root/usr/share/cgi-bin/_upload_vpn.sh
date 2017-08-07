@@ -6,4 +6,4 @@ if [ -z "$file" -o -z "$original" ];
   exit 1
 fi
 BASE="/etc/openvpn/configurations"
-echo "$original" > "$BASE/$file"
+printf %s "$original" > "$BASE/$file"

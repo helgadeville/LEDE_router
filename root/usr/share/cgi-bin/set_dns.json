@@ -1,0 +1,19 @@
+#!/bin/sh
+# include POST/GET READER
+. /usr/share/cgi-bin/request
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+# check arguments
+DHCPIFACE=`uci show dhcp.lan.interface | sed "s/dhcp\.lan\.interface=//g" | sed "s/\'//g"`
+if [ -z "$dns1" -a -z "$dns2"];
+ then
+  echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  exit 1
+fi
+sudo /usr/share/cgi-bin/_set_dns.sh $dns1 $dns2 > /dev/null 2>&1
+if [ $? -gt 0 ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
+ else
+  echo "{\"status\":\"0\",\"message\":\"OK\"}"
+fi

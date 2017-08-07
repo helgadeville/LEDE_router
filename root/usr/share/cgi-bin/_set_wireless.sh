@@ -10,12 +10,12 @@ uci set wireless.$iface.disabled=$disabled
 #
 if [ -n "$ssid" ];
  then
-  uci set wireless.$iface.ssid=$ssid
+  uci set wireless.$iface.ssid="$ssid"
 fi
 #
 if [ -n "$key" ];
  then
-  uci set wireless.$iface.key=$key
+  uci set wireless.$iface.key="$key"
 fi
 #
 uci set wireless.$iface.encryption=psk2

@@ -7,7 +7,7 @@ if [ -z "$current" ];
 fi
 VPN=`/usr/share/cgi-bin/_vpnstate.sh 2> /dev/null`
 BASE="/etc/openvpn/vpn.conf"
-echo "$current" > "$BASE"
+printf %s "$current" > "$BASE"
 if [ "$VPN" != "down" ];
  then
   /usr/share/cgi-bin/_vpnrestart.sh
