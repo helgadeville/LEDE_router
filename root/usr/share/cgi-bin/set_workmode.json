@@ -90,7 +90,7 @@ if [ $result -gt 0 ];
     RBT=full
   fi
   echo "{\"status\":\"0\",\"message\":\"OK\",\"reboot\":\"$RBT\"}"
-  [ "$RBT" = "cable" ] && /etc/init.d/network reload &
-  [ "$RBT" = "wifi" ] && wifi up &
+  [ "$RBT" = "cable" ] && sudo /usr/share/cgi-bin/_restart.sh &
+  [ "$RBT" = "wifi" ] && sudo /usr/share/cgi-bin/_restart.sh &
   [ "$RBT" = "full" ] && sudo /usr/share/cgi-bin/_restart.sh &
 fi
