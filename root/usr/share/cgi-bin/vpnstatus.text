@@ -2,4 +2,4 @@
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
 sudo /usr/share/cgi-bin/_vpnstate.sh 2> /dev/null
-cat /var/log/openvpn-status.log 2> /dev/null
+sudo /usr/share/cgi-bin/_vpnstatistics.sh 2> /dev/null
