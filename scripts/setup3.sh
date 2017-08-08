@@ -1,4 +1,5 @@
 #!/bin/sh
+# upload root.tgz to /root
 # Install some fancy packages for initial VPN setup
 opkg update
 opkg install bind-server openvpn-openssl nano
