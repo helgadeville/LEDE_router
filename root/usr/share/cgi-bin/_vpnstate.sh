@@ -1,9 +1,10 @@
 #!/bin/sh
 VTUN=`ifconfig | grep tun`
+[ -n "$VTUN" ] && VTUN=yes
 OVPN=`pgrep openvpn`
-VSTART=`pgrep startingvpn`
-VSTOP=`pgrep stoppingvpn`
-VERR=`pgrep errorvpn`
+VSTART=`ps | grep s[t]artingvpn`
+VSTOP=`ps | grep s[t]oppingvpn`
+VERR=`ps | grep e[r]rorvpn`
 if [ -n "$VSTART" -o -n "$VSTOP" -o -n "$VERR" ];
  then
   [ -n "$VSTART" ] && VPN=starting
@@ -16,7 +17,8 @@ if [ -n "$VSTART" -o -n "$VSTOP" -o -n "$VERR" ];
     VPN=up
    else
     VPN=down
-    [ -n "$OVPN" -o -n "$VTUN" ] && VPN=error
+    [ -n "$OVPN" -a -z "$VTUN" ] && VPN=stopping
+    [ -z "$OVPN" -a -n "$VTUN" ] && VPN=error
   fi
 fi
 echo $VPN

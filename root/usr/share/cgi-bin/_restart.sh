@@ -7,5 +7,5 @@ sleep 1
 if [ -n "$lan" ];
  then
   /etc/init.d/lighttpd reload > /dev/null 2>&1
-  /etc/init.d/dropbear reload > /dev/null 2>&1
+  /etc/init.d/dropbear restart > /dev/null 2>&1
 fi

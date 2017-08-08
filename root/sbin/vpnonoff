@@ -1,31 +1,32 @@
 #!/bin/sh
-STR=$(pgrep startingvpn)
+STR=`ps | grep s[t]artingvpn`
 VPN=$(pgrep openvpn)
 TUN=$(ifconfig | grep tun)
+[ -n "$TUN" ] && TUN=yes
 if [ -z "$TUN" ]; # no tun
  then
   if [ -z "$VPN" ]; # no openvpn
    then
     /etc/init.d/openvpn start
     if [[ $? == 0 ]]; then
-      /etc/openvpn/startingvpn
+      /etc/openvpn/startingvpn &
      else
-      /etc/openvpn/errorvpn
+      /etc/openvpn/errorvpn &
     fi
    else # no tun but openvpn process exists
     if [ -z "$STR" ]; # startingvpn timeout exceeded
      then
       /etc/init.d/openvpn restart
       if [[ $? == 0 ]]; then
-        /etc/openvpn/startingvpn
+        /etc/openvpn/startingvpn &
        else
-        /etc/openvpn/errorvpn
+        /etc/openvpn/errorvpn &
       fi
      else # startingvpn timeout not exceeded, wait
       exit 0
     fi
   fi
  else # tun exists, stop openvpn
-  /etc/openvpn/stoppingvpn
+  /etc/openvpn/stoppingvpn &
   /etc/init.d/openvpn stop
 fi
