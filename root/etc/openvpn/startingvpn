@@ -1,5 +1,7 @@
 #!/bin/sh
 echo VPN initializing...
+killall stoppingvpn 2> /dev/null
+killall errorvpn 2> /dev/null
 QSSled="/sys/class/leds/tp-link:green:qss" 
 echo none > $QSSled/trigger
 echo timer > $QSSled/trigger

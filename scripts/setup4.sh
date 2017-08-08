@@ -2,11 +2,17 @@
 # Luci etc.
 echo Now preparing lighttpd
 opkg update
-opkg install lighttpd
+opkg install sudo patch lighttpd
 opkg install lighttpd-mod-access lighttpd-mod-alias lighttpd-mod-auth lighttpd-mod-authn_file lighttpd-mod-cgi lighttpd-mod-evasive
 opkg install coreutils-base64 openssl-util curl iwinfo
+# patching some stuff
+patch /etc/init.d/openvpn /root/patches/openvpn.patch
+patch /lib/functions/procd.sh /root/patches/procd.sh.patch
+# GUI
 echo Now preparing GUI
 rmdir /etc/lighttpd/conf.d
+rm /etc/sudoers.d 2> /dev/null
+mkdir /etc/sudoers.d
 cp /root/etc/sudoers.d/http /etc/sudoers.d
 cp /root/etc/lighttpd/lighttpd.conf /etc/lighttpd
 cp /root/etc/lighttpd/.htdigest /etc/lighttpd
