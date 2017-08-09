@@ -1,17 +1,20 @@
 #!/bin/sh
 echo TO PROCEED, YOU NEED TO HAVE EXT4 USB PENDRIVE IN USB PORT
+echo ALSO YOU NEED ROOT.TGZ AND EXPORT.TGZ ON THE PENDRIVE
 mount /dev/sda1 /mnt
-tar -C /overlay/ -c . -f - | tar -C /mnt/ -xf -
-sync && umount /dev/sda1
-
-# REBOOT NOW !!!
-
+mv /mnt/root.tgz /tmp
+cd /tmp
+tar xzf root.tgz
+mv root/* /root
+rmdir root
+rm root.tgz
+cd /root
+mv /mnt/export.tgz /root
 cp /root/etc/config/fstab /etc/config
 chmod 444 /etc/config/fstab
-dd if=/dev/zero of=/swapfile bs=1024 count=65536
-mkswap /swapfile
-swapon /swapfile
 service fstab enable
 readlink -f /etc/rc.d/*fstab
-echo REBOOT NOW
-
+tar -C /overlay/ -c . -f - | tar -C /mnt/ -xf -
+sync && umount /dev/sda1
+# NEED TO REBOOT
+echo REBOOT NOW !

@@ -1,2 +1,2 @@
 #!/bin/bash
-make image PROFILE=tl-mr3220-v2 PACKAGES="kmod-usb-storage kmod-scsi-core kmod-fs-ext4 block-mount -luci -luci-base"
+make image PROFILE=tl-mr3220-v2 PACKAGES="kmod-usb-storage kmod-scsi-core kmod-fs-ext4 block-mount"

@@ -1,10 +1,63 @@
 #!/bin/sh
-# Luci etc.
-echo Now preparing lighttpd
+# Install some fancy packages for initial VPN setup
 opkg update
-opkg install sudo patch lighttpd
-opkg install lighttpd-mod-access lighttpd-mod-alias lighttpd-mod-auth lighttpd-mod-authn_file lighttpd-mod-cgi lighttpd-mod-evasive
-opkg install coreutils-base64 openssl-util curl iwinfo
+opkg install bind-server openvpn-openssl nano sudo patch lighttpd lighttpd-mod-alias lighttpd-mod-auth lighttpd-mod-authn_file lighttpd-mod-cgi lighttpd-mod-evasive coreutils-base64 openssl-util curl iwinfo
+# Prepare files and setup buttons
+cp -R /root/etc/openvpn/* /etc/openvpn
+cp /root/sbin/* /sbin
+cp /root/etc/rc.local /etc
+mkdir /root/rc.button
+mv /etc/rc.button/rfkill /etc/rc.button/rfkill_old
+cp /root/etc/rc.button/wps /etc/rc.button
+# setup bind/named
+cp /root/etc/bind/named.conf /etc/bind
+cp /root/etc/config/dhcp /etc/config
+cp /root/etc/init.d/netwait /etc/init.d
+service netwait enable
+service dnsmasq restart
+service named restart
+# setup VPN
+echo Removing shitty examples
+uci del openvpn.sample_server
+uci del openvpn.sample_client
+uci del openvpn.custom_config
+echo New OpenVPN instance
+# a new OpenVPN instance:
+uci set openvpn.vpn=openvpn
+uci set openvpn.vpn.enabled=1
+uci set openvpn.vpn.config=/etc/openvpn/vpn.conf
+echo New network interface
+# a new network interface for tun:
+uci set network.vpn=interface
+uci set network.vpn.proto=none
+uci set network.vpn.ifname=tun0
+echo New Firewall zone
+# a new firewall zone (for VPN):
+uci add firewall zone
+uci set firewall.@zone[-1].name=vpn
+uci set firewall.@zone[-1].input=REJECT
+uci set firewall.@zone[-1].output=ACCEPT
+uci set firewall.@zone[-1].forward=REJECT
+uci set firewall.@zone[-1].masq=1
+uci set firewall.@zone[-1].mtu_fix=1
+uci add_list firewall.@zone[-1].network=vpn
+echo Enable forwarding
+# enable forwarding from LAN to VPN:
+uci add firewall forwarding
+uci set firewall.@forwarding[-1].src=lan
+uci set firewall.@forwarding[-1].dest=vpn
+# some defaults
+uci set wireless.default_radio0.encryption=psk2
+uci set wireless.default_radio0.key=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 12`
+# disable wan access to router
+uci set dropbear.@dropbear[0].Interface=lan
+echo Commiting changes
+# Finally, you should commit UCI changes:
+uci commit
+/etc/init.d/openvpn disable
+/etc/init.d/openvpn stop
+# http server et al
+echo Now preparing lighttpd
 # patching some stuff
 patch /etc/init.d/openvpn /root/patches/openvpn.patch
 patch /lib/functions/procd.sh /root/patches/procd.sh.patch
@@ -43,8 +96,7 @@ uci set wireless.wan.disabled=1
 uci commit
 # configurations
 chmod 400 /root/password
-mkdir /root/configurations
-mkdir /root/configurations/custom
+mkdir -p /root/configurations/custom 2> /dev/null
 file=default /usr/share/cgi-bin/_save_current_config.sh > /dev/null 2>&1
 mv /root/configurations/custom/default.cgz /root/configurations
 echo create factory configuration
