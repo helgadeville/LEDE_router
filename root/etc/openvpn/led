@@ -1,0 +1,6 @@
+#!/bin/sh
+VPNLED=none
+[ -e "/sys/class/leds/tp-link:green:3g" ] && VPNLED="/sys/class/leds/tp-link:green:3g"
+[ -e "/sys/class/leds/tp-link:green:wps" ] && VPNLED="/sys/class/leds/tp-link:green:wps"
+[ -e "/sys/class/leds/tp-link:green:qss" ] && VPNLED="/sys/class/leds/tp-link:green:qss"
+echo "$VPNLED"

@@ -2,7 +2,8 @@
 echo VPN deinitializing...
 killall startingvpn 2> /dev/null
 killall errorvpn 2> /dev/null
-QSSled="/sys/class/leds/tp-link:green:qss" 
+QSSled=`/etc/openvpn/led`                 
+[ QSSled = "none" ] && exit 0
 echo none > $QSSled/trigger
 echo timer > $QSSled/trigger
 echo 700 > $QSSled/delay_on
