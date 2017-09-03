@@ -17,7 +17,12 @@ while [ $(iwinfo | grep -c "ESSID: unknown") -ge 1 ]; do
      logger Reverting configuration to normal AP - wireless client can not be started - 
      uci set wireless.wan.disabled=1
      uci commit
-     wifi up
+     /etc/init.d/network restart
+     /etc/init.d/netwait start
+     /etc/init.d/firewall reload
+     /etc/init.d/dnsmasq reload
+     /etc/init.d/named restart
+     /etc/init.d/dropbear restart
 #    uncomment the following lines to try AP+STA after reboot
      sleep 3
      uci del wireless.wan.disabled 2> /dev/null
