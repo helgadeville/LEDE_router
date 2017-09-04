@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+case "$ACTION" in
+released)
+
+  /sbin/requestmodechange wisp
+
+;;
+esac
+
+return 0

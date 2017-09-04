@@ -1,0 +1,3 @@
+#!/bin/sh
+killall queuemodechange
+/sbin/queuemodechange $1 &

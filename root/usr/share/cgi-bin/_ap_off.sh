@@ -1,10 +1,10 @@
 #!/bin/sh
 # usage: /usr/share/cgi-bin/_ap_off.sh
-# must have parameters: $device $switch $proto, if $proto is static then must have $ipaddr and $netmask
-# may have $mac
+# must have parameters: $device $proto, if $proto is static then must have $ipaddr and $netmask
+# may have $switch $mac
 # $device should be eth1 (default WAN port) and $switch should be eth0 (multiport)
 # but this may vary
-[ -z "$device" -o -z "$switch" ] && exit 1
+[ -z "$device" ] && exit 1
 [ -n "$proto" -a "$proto" != "dhcp" -a "$proto" != "static" ] && exit 1
 [ "$proto" = "static" ] && [ -z "$ipaddr" -o -z "$netmask" ] && exit 1
 #
@@ -40,7 +40,12 @@ uci set wireless.wan.disabled=1
 uci del wireless.wan.device 2> /dev/null
 #
 # unbridge previous wan port from lan
-uci set network.lan.ifname=$switch
+if [ -n "$switch" ];
+ then
+  uci set network.lan.ifname=$switch
+ else
+  uci del network.lan.ifname 2> /dev/null
+fi
 #
 # commit & reload
 uci commit

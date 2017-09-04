@@ -20,7 +20,12 @@ fi
 RET="$RET\"$SELECTED\","
 # get list of ethernet non-switch devices and radio devices
 switch=`swconfig list | sed 's/Found.*-[*[:space:]]//'`
-wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
+if [ -n "$switch" ];
+ then
+  wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
+ else
+  wired=`ls -d /sys/class/net/eth* | sed 's/\/sys\/class\/net\///'`
+fi
 wireless=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
 # read networks of ethernet devices
 RET="$RET\"wired\":["

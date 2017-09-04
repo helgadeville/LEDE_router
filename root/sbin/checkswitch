@@ -1,0 +1,17 @@
+#!/bin/sh
+if ! grep -qe "sw\d.* in" /sys/kernel/debug/gpio ; then 
+ echo none
+ exit 0
+fi
+if grep -qe "sw2.*in  hi" /sys/kernel/debug/gpio ; then
+if grep -qe "sw1.*in  hi" /sys/kernel/debug/gpio ; then
+# AP
+echo ap
+else
+# WISP
+echo wisp
+fi
+else
+# 3G
+echo 3g
+fi

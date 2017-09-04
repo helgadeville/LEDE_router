@@ -1,12 +1,12 @@
 #!/bin/sh
 # usage: /usr/share/cgi-bin/_ap_on.sh 
-# $wired $switch $device $ssid $encryption $proto must be set
+# $wired $device $ssid $encryption $proto must be set
 # when $proto=static then also ipaddr and netmask must be set
-# $key and $mac are optional
+# $key, $switch and $mac are optional
 # eth1 assumed to be blue "generic" WAN port, so "$wired" will be eth1 by default
 # eth0 is the multiport LAN switch, so "$switch" will be eth0 by default
 # check parameters
-[ -z "$wired" -o -z "$switch" -z "$device" -o -z "$ssid" -o -z "$encryption" -o -z "$proto" ] && exit 1
+[ -z "$wired" -o -z "$device" -o -z "$ssid" -o -z "$encryption" -o -z "$proto" ] && exit 1
 [ -n "$proto" -a "$proto" != "dhcp" -a "$proto" != "static" ] && exit 1
 [ "$proto" = "static" ] && [ -z "$ipaddr" -o -z "$netmask" ] && exit 1
 [ "$encryption" != "none" -a "$encryption" != "wep" -a "$encryption" != "psk" -a "$encryption" != "psk2" ] && exit 1
@@ -33,11 +33,14 @@ uci set wireless.wan=wifi-iface
 uci set wireless.wan.device="$device"
 uci set wireless.wan.network=wan
 uci set wireless.wan.mode=sta
+
 if [ -n "$proto" ];
  then
   uci set wireless.wan.proto="$proto"
+  uci set network.wan=interface
   uci set network.wan.proto="$proto"
 fi
+
 if [ "$proto" = "static" ];
  then
   uci set wireless.wan.ipaddr="$ipaddr"
@@ -45,6 +48,7 @@ if [ "$proto" = "static" ];
   uci set network.wan.ipaddr="$ipaddr"
   uci set network.wan.netmask="$netmask"
 fi
+
 if [ "$proto" = "dhcp" ];
  then
   uci del wireless.wan.ipaddr 2> /dev/null
@@ -52,6 +56,7 @@ if [ "$proto" = "dhcp" ];
   uci del network.wan.ipaddr 2> /dev/null
   uci del network.wan.netmask 2> /dev/null
 fi
+
 uci set wireless.wan.ssid="$ssid"
 uci set wireless.wan.encryption="$encryption"
 if [ "$encryption" = "none" ];
@@ -70,7 +75,13 @@ fi
 uci del wireless.wan.disabled 2> /dev/null
 
 # bridge previous wan port to lan, was eth0 originally
-uci set network.lan.ifname="$wired $switch"
+if [ -n "$switch" ];
+ then
+  uci set network.lan.ifname="$wired $switch"
+ else
+  uci set network.lan.ifname="$wired"
+fi
 
 # commit & reload
 uci commit
+

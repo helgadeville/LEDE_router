@@ -1,0 +1,14 @@
+#!/bin/sh
+sw=`checkswitch`
+if [ "$sw" = "ap" ];
+ then
+  ACTION='released' /etc/rc.button/ap
+fi
+if [ "$sw" = "3g" ];
+ then
+  /etc/rc.button/3g
+fi
+if [ "$sw" = "wisp" ];
+ then
+  /etc/rc.button/wisp
+fi

@@ -1,0 +1,5 @@
+#!/bin/sh
+sleep 3
+PID=`ps | grep mode[c]hange | sed 's/^ *\([[:digit:]]\+\).*/\1/'`
+[ -n "$PID" ] && wait $PID
+/sbin/modechange $1 &

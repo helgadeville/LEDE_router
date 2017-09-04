@@ -9,5 +9,5 @@ if [ -z "$user" -o -z "$pass" ];
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
-sudo /usr/share/cgi-bin/_set_vpn_auth.sh $user $pass > /dev/null 2>&1
+sudo /usr/share/cgi-bin/_set_vpn_auth.sh $user $pass $connect > /dev/null 2>&1
 echo "{\"status\":\"0\",\"message\":\"OK\"}"

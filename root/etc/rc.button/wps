@@ -9,7 +9,13 @@ released)
 		/sbin/vpnonoff
 	elif [ "$SEEN" -gt 3 ]
 	then
-		/sbin/wifionoff
+		MODEL=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//'`
+		if [ "$MODEL" = "TL-MR3020" ];
+		then
+			/sbin/reboot
+		else
+			/sbin/wifionoff
+		fi
 	fi
 ;;
 esac

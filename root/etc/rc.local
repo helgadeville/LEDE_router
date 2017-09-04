@@ -2,6 +2,11 @@
 # Put your custom commands here that should be executed once
 # the system init finished. By default this file does nothing.
 
+# update mode if needed
+MODE=`/sbin/checkswitch`
+[ "$MODE" != 'none' ] && /sbin/modechange $MODE
+
+# setup ap access check
 /sbin/fix_sta.sh > /dev/null 2>&1 &
 
 exit 0

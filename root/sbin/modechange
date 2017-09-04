@@ -1,0 +1,132 @@
+#!/bin/sh
+# This will work only if there are no extra wired or wireless interfaces
+
+# Pre-step: get devices info
+
+switch=`swconfig list | sed 's/Found.*-[*[:space:]]//'`
+if [ -n "$switch" ]; 
+ then
+  wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
+ else
+  wired=`ls -d /sys/class/net/eth* | sed 's/\/sys\/class\/net\///'`
+fi
+device=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
+iface=`uci show wireless | grep "\.device=.*$device" | grep -v '^wireless\.wan' | sed 's/wireless\.// ; s/\.device=.*//'`
+
+# first step: check if we are already in desired mode
+
+MODE=
+CHK=`uci get network.wan.ifname 2> /dev/null`
+if [ -n "$CHK" -a "$CHK" = "$device" ];
+ then
+  MODE=ap
+ else
+  # MODE=wisp or 3g, difference is in interface activity
+  CHK=`uci get wireless.$iface.disabled 2> /dev/null`
+  if [ -z "$CHK" -o "$CHK" = "0" ];
+   then
+    MODE=3g
+   else
+    MODE=wisp
+  fi
+fi
+
+if [ "$1" = "$MODE" ];
+ then
+  logger "Mode already set to $MODE as requested, no action"
+  exit 0
+fi
+
+# second step: set mode as required
+
+if [ "$1" = "ap" ];
+ then
+
+  # enable rebind, was 0
+  uci set dhcp.@dnsmasq[0].rebind_protection=1
+
+  # restore wan ifname section
+  uci set network.wan.ifname=$device
+  uci del network.wan.disabled 2> /dev/null
+
+  # remove setup wireless
+  uci set wireless.wan.disabled=1
+  uci del wireless.wan.device 2> /dev/null
+
+  # unbridge previous wan port from lan
+  if [ -n "$switch" ];
+   then
+    uci set network.lan.ifname=$switch
+   else
+    uci del network.lan.ifname 2> /dev/null
+  fi
+
+  # always activate AP
+  uci set wireless.$iface.mode=ap
+  uci del wireless.$iface.disabled 2> /dev/null
+
+  # commit & reload
+  uci commit
+
+fi
+
+if [ "$1" = "wisp" -o "$1" = "3g" ];
+ then
+
+  # disable rebind, was 1
+  uci set dhcp.@dnsmasq[0].rebind_protection=0
+
+  # remove wan ifname section, was 'eth1' originally
+  uci del network.wan.ifname 2> /dev/null
+  uci del network.wan.disabled 2> /dev/null
+
+  # enable device
+  uci set wireless."$device".disabled=0
+  # setup wireless
+  uci set wireless.wan=wifi-iface
+  uci set wireless.wan.device="$device"
+  uci set wireless.wan.network=wan
+  uci set wireless.wan.mode=sta
+
+  uci del wireless.wan.disabled 2> /dev/null
+
+  # bridge previous wan port to lan, was eth0 originally
+  if [ -n "$switch" ];
+   then
+    uci set network.lan.ifname="$wired $switch"
+   else
+    uci set network.lan.ifname="$wired"
+  fi
+
+  # if 3g means activate repeater
+  if [ "$1" = "3g" ];
+   then
+    # activate repeater
+    uci set wireless.$iface.mode=ap
+    uci del wireless.$iface.disabled 2> /dev/null
+   else
+    # deactivate repeater
+    uci set wireless.$iface.disabled=1
+  fi
+
+  # commit & reload
+  uci commit
+
+fi
+
+# reload network
+if [ "$1" = "ap" -o "$MODE" = "ap" ];
+ then
+  /etc/init.d/network restart > /dev/null 2>&1
+  /etc/init.d/netwait start > /dev/null 2>&1
+  /etc/init.d/firewall reload > /dev/null 2>&1
+  /etc/init.d/dnsmasq reload > /dev/null 2>&1
+  /etc/init.d/named restart > /dev/null 2>&1
+  /etc/init.d/lighttpd reload > /dev/null 2>&1
+  /etc/init.d/dropbear reload > /dev/null 2>&1
+ else
+  # just wifi change
+  /sbin/wifi down && /sbin/wifi up
+fi
+
+logger "Device mode changed to $1"

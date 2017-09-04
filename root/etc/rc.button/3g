@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+case "$ACTION" in
+released)
+
+  /sbin/requestmodechange 3g
+
+;;
+esac
+
+return 0
