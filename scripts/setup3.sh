@@ -128,10 +128,13 @@ find /usr/* -type f >> /tmp/_factory.list
 find /www/* -type f >> /tmp/_factory.list
 tar czf /root/configurations/factory.cgz -T /tmp/_factory.list > /dev/null 2>&1
 rm /tmp/_factory.list
+# FINAL TOUCH : setup WPS led
+uci del system.led_wps 2> /dev/null
+uci set system.led_wps=led
+uci set system.led_wps.name='WPS'
+uci set system.led_wps.sysfs='tp-link:green:wps'
+uci set system.led_wps.default=0
+uci commit
 # REBOOT IS A GOOD IDEA NOW
 reboot
-
-
-
-
 
