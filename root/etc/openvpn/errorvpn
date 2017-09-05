@@ -3,11 +3,16 @@ echo VPN initializing...
 killall startingvpn 2> /dev/null
 killall stoppingvpn 2> /dev/null
 QSSled=`/etc/openvpn/led`                 
-[ "$QSSled" = "none" ] && exit 0
-echo none > $QSSled/trigger
-echo timer > $QSSled/trigger
-echo 120 > $QSSled/delay_on
-echo 120 > $QSSled/delay_off
+if [ "$QSSled" != "none" ];
+ then
+  echo none > $QSSled/trigger
+  echo timer > $QSSled/trigger
+  echo 120 > $QSSled/delay_on
+  echo 120 > $QSSled/delay_off
+fi
 sleep 60
-echo none > $QSSled/trigger
-echo 0 > $QSSled/brightness
+if [ "$QSSled" != "none" ];
+ then
+  echo none > $QSSled/trigger
+  echo 0 > $QSSled/brightness
+fi
