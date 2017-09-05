@@ -4,6 +4,6 @@ killall startingvpn 2> /dev/null
 killall stoppingvpn 2> /dev/null
 killall errorvpn 2> /dev/null
 QSSled=`/etc/openvpn/led`                 
-[ QSSled = "none" ] && exit 0
+[ "$QSSled" = "none" ] && exit 0
 echo none > $QSSled/trigger
 echo 1 > $QSSled/brightness
