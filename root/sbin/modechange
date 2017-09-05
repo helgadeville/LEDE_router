@@ -46,7 +46,7 @@ if [ "$1" = "ap" ];
   uci set dhcp.@dnsmasq[0].rebind_protection=1
 
   # restore wan ifname section
-  uci set network.wan.ifname=$device
+  uci set network.wan.ifname=$wired
   uci del network.wan.disabled 2> /dev/null
 
   # remove setup wireless
