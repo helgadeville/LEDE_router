@@ -17,7 +17,7 @@ iface=`uci show wireless | grep "\.device=.*$device" | grep -v '^wireless\.wan' 
 
 MODE=
 CHK=`uci get network.wan.ifname 2> /dev/null`
-if [ -n "$CHK" -a "$CHK" = "$device" ];
+if [ -n "$CHK" -a "$CHK" = "$wired" ];
  then
   MODE=ap
  else
