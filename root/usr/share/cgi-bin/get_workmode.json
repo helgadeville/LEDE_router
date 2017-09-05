@@ -27,6 +27,17 @@ if [ -n "$switch" ];
   wired=`ls -d /sys/class/net/eth* | sed 's/\/sys\/class\/net\///'`
 fi
 wireless=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
+# check switch position - for AP, only wired can pass
+# for WISP and 3G, only wireless can pass
+SW=`/sbin/checkswitch`
+if [ "$SW" = "ap" ];
+ then
+  wireless=
+fi
+if [ "$SW" = "wisp" -o "$SW" = "3g" ];
+ then
+  wired=
+fi
 # read networks of ethernet devices
 RET="$RET\"wired\":["
 wired_networks=

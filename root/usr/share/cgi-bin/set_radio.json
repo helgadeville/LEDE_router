@@ -9,6 +9,12 @@ if [ -z "$device" -o -z "$disabled" ];
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
+# check if hardware switch present, if so deny activation / deactivation
+SW=`/sbin/checkswitch`
+if [ "$SW" != "none" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Cannot change radio state with hardware switch present\"}"
+fi
 sudo /usr/share/cgi-bin/_set_radio.sh $device $disabled $channel > /dev/null 2>&1
 if [ $? -gt 0 ];
  then

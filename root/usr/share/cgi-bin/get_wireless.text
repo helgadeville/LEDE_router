@@ -1,6 +1,12 @@
 #!/bin/sh
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
+SW=`/sbin/checkswitch`
+if [ "$SW" != "none" ];
+ then
+  echo "apwisp3g=hw-switch"
+  echo "apwisp3g=$SW"
+fi
 uci show wireless | sed 's/^wireless\.//'
 RD=`uci show wireless | grep 'wifi-device' | sed 's/wireless\.//' | sed 's/=wifi-device//'`
 for radio in $RD

@@ -4,10 +4,11 @@ echo ""
 SYSTEM=`cat /proc/cpuinfo | grep "system type" | sed 's/^[^:]*:[ ]*//'`
 MACHINE=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*//'`
 CPU=`cat /proc/cpuinfo | grep "cpu model" | sed 's/^[^:]*:[ ]*//'`
+SW=`/sbin/checkswitch`
 UP=`uptime`
 DATE=`date`
 INTERNET=`sudo /usr/share/cgi-bin/_internet.sh 2> /dev/null`
 WIFI=`sudo /usr/share/cgi-bin/_radios.sh 2> /dev/null`
 WORKMODE=`/usr/share/cgi-bin/get_workmode.sh 2> /dev/null`
 VPN=`sudo /usr/share/cgi-bin/_vpnstate.sh 2> /dev/null`
-echo "{\"system\":\"$SYSTEM\",\"machine\":\"$MACHINE\",\"cpu\":\"$CPU\",\"up\":\"$UP\",\"date\":\"$DATE\",\"internet\":\"$INTERNET\",\"wireless\":$WIFI,\"workmode\":\"$WORKMODE\",\"VPN\":\"$VPN\"}"
+echo "{\"system\":\"$SYSTEM\",\"machine\":\"$MACHINE\",\"cpu\":\"$CPU\",\"apwisp3g\":\"$SW\",\"up\":\"$UP\",\"date\":\"$DATE\",\"internet\":\"$INTERNET\",\"wireless\":$WIFI,\"workmode\":\"$WORKMODE\",\"VPN\":\"$VPN\"}"

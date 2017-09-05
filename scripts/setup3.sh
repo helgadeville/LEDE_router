@@ -105,6 +105,9 @@ rm -rf /tmp/export
 # setup configurations and stations
 mkdir /root/stations
 echo "OurHardWorkByTheseWordsGuarded.PleaseDoNotSteal." /root/password
+# remove password from Wifi
+uci set wireless.default_radio0.encryption=none
+uci del wireless.default_radio0.key 2> /dev/null
 # additional setup for AP + STA
 uci set wireless.wan=wifi-iface
 uci set wireless.wan.device=radio0
@@ -112,6 +115,12 @@ uci set wireless.wan.proto=dhcp
 uci set wireless.wan.network=wan
 uci set wireless.wan.mode=sta
 uci del wireless.wan.disabled 2> /dev/null
+# FINAL TOUCH : setup WPS led
+uci del system.led_wps 2> /dev/null
+uci set system.led_wps=led
+uci set system.led_wps.name='WPS'
+uci set system.led_wps.sysfs='tp-link:green:wps'
+uci set system.led_wps.default=0
 uci commit
 # configurations
 chmod 400 /root/password
@@ -128,13 +137,6 @@ find /usr/* -type f >> /tmp/_factory.list
 find /www/* -type f >> /tmp/_factory.list
 tar czf /root/configurations/factory.cgz -T /tmp/_factory.list > /dev/null 2>&1
 rm /tmp/_factory.list
-# FINAL TOUCH : setup WPS led
-uci del system.led_wps 2> /dev/null
-uci set system.led_wps=led
-uci set system.led_wps.name='WPS'
-uci set system.led_wps.sysfs='tp-link:green:wps'
-uci set system.led_wps.default=0
-uci commit
 # REBOOT IS A GOOD IDEA NOW
 reboot
 

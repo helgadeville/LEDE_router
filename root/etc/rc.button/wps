@@ -4,18 +4,32 @@
 
 case "$ACTION" in
 released)
+	MODEL=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//'`
 	if [ "$SEEN" -lt 3 ]
 	then
 		/sbin/vpnonoff
 	elif [ "$SEEN" -gt 3 ]
 	then
-		MODEL=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//'`
 		if [ "$MODEL" = "TL-MR3020" ];
 		then
-			/sbin/reboot
+			echo "REBOOT" > /dev/console
+			sync
+			reboot
 		else
 			/sbin/wifionoff
 		fi
+	elif [ "$SEEN" -gt 10 ]
+	then
+		if [ "$MODEL" = "TL-MR3020" ];
+                then
+                        echo "FACTORY RESET" > /dev/console
+        	        sync
+	                file=factory /usr/share/cgi-bin/_set_system_config.sh
+                else
+			echo "REBOOT" > /dev/console
+                        sync
+			reboot
+                fi
 	fi
 ;;
 esac

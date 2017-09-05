@@ -44,6 +44,21 @@ for wifi in $wireless
  do
   [ "$wifi" = "$device" ] && is_wireless=yes
 done
+# check if hardware switch present and if so check if proper workmode selected
+SW=`/sbin/checkswitch`
+if [ "$SW" != "none" ];
+ then
+  if [ "$SW" = "ap" -a "$is_wireless" = "yes" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"Cannot change workmode with hardware switch present\"}"
+    exit 1
+  fi
+  if [ "$SW" != "ap" -a "$is_wireless" != "no" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"Cannot change workmode with hardware switch present\"}"
+    exit 1
+  fi
+fi
 if [ -n "$proto" -a "$proto" != "dhcp" -a "$proto" != "static" ];
  then
   echo "{\"status\":\"1\",\"message\":\"Bad proto value\"}"
