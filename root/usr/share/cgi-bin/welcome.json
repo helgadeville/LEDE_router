@@ -4,7 +4,7 @@ echo ""
 SYSTEM=`cat /proc/cpuinfo | grep "system type" | sed 's/^[^:]*:[ ]*//'`
 MACHINE=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*//'`
 CPU=`cat /proc/cpuinfo | grep "cpu model" | sed 's/^[^:]*:[ ]*//'`
-SW=`/sbin/checkswitch`
+SW=`sudo /usr/share/cgi-bin/_checkswitch.sh 2> /dev/null`
 UP=`uptime`
 DATE=`date`
 INTERNET=`sudo /usr/share/cgi-bin/_internet.sh 2> /dev/null`

@@ -29,7 +29,7 @@ fi
 wireless=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
 # check switch position - for AP, only wired can pass
 # for WISP and 3G, only wireless can pass
-SW=`/sbin/checkswitch`
+SW=`sudo /usr/share/cgi-bin//_checkswitch.sh 2> /dev/null`
 if [ "$SW" = "ap" ];
  then
   wireless=

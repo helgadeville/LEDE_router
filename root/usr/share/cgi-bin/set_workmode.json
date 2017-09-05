@@ -45,7 +45,7 @@ for wifi in $wireless
   [ "$wifi" = "$device" ] && is_wireless=yes
 done
 # check if hardware switch present and if so check if proper workmode selected
-SW=`/sbin/checkswitch`
+SW=`sudo /usr/share/cgi-bin/_checkswitch.sh 2> /dev/null`
 if [ "$SW" != "none" ];
  then
   if [ "$SW" = "ap" -a "$is_wireless" = "yes" ];
