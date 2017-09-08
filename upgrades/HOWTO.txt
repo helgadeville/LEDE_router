@@ -1,0 +1,24 @@
+First, a data directory is needed.
+In this directory there should exists 3 entries, each entry is optional:
+
+* file named "-" (minus sign)
+* directory named "+" (plus sign)
+* file export.tgz
+
+File "-" shall list files to be deleted, full path, separated by newlines:
+
+/sbin/whatever
+/etc/named/whatever
+
+Directory "+" shall contain files to be added to / root directory in a proper
+directory structure, EXCLUDING the /root folder.
+
+File export.tgz shall contain tar-compressed /www/ directory of GUI
+
+---
+This should all be compressed with tar using password - same as is in root directory of router
+---
+
+WARNING !!! mkbuf _MUST_ be called with target directory below
+
+
