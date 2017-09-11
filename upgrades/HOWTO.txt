@@ -1,9 +1,11 @@
 First, a data directory is needed.
-In this directory there should exists 3 entries, each entry is optional:
+In this directory there should exists 5 entries, each entry is optional:
 
+* file named "preinstall.sh", this is a script which will be run prior to installation
 * file named "-" (minus sign)
 * directory named "+" (plus sign)
 * file export.tgz
+* file named "postinstall.sh", this is a script which will be run post installation process
 
 File "-" shall list files to be deleted, full path, separated by newlines:
 

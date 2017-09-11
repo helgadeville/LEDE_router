@@ -1,5 +1,5 @@
 #!/bin/sh
-# usage: _set_wireless.sh $device $iface $disabled $ssid $key
+# usage: _set_wireless.sh $device $iface $disabled $ssid $key $isolate
 # check parameters
 if [ -z "$device" -o -z "$iface" -o -z "$disabled" ];
  then
@@ -28,6 +28,21 @@ if [ -n "$key" ];
 fi
 #
 uci set wireless.$iface.encryption=psk2
+#
+if [ "$isolate" = "true" -o "$isolate" = "yes" -o "$isolate" = "1" ];
+ then
+  uci set wireless.$iface.isolate=1
+ else
+  uci del wireless.$iface.isolate > /dev/null 2>&1
+fi
+#
+if [ "$hidden" = "true" -o "$hidden" = "yes" -o "$hidden" = "1" ];
+ then
+  uci set wireless.$iface.hidden=1
+ else
+  uci del wireless.$iface.hidden > /dev/null 2>&1
+fi
+#
 uci commit
 # do something only when radio enabled
 ENA=`uci get wireless.$device.disabled 2> /dev/null`

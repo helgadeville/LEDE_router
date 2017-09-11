@@ -1,16 +1,17 @@
 #!/bin/sh
-# accepts $device $iface $disabled $key $ssid $isolate $hidden
 # include POST/GET READER
 . /usr/share/cgi-bin/request
 echo "Content-Type: application/json; charset=utf-8"
 echo ""
 # check arguments
-if [ -z "$device" -o -z "$iface" -o -z "$disabled" ];
+if [ -z "$readonly" ];
  then
   echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   exit 1
 fi
-device="$device" iface="$iface" disabled="$disabled" ssid="$ssid" key="$key" isolate="$isolate" hidden="$hidden" sudo -E /usr/share/cgi-bin/_set_wireless.sh > /dev/null 2>&1
+rdo=1
+[ "$readonly" = "no" -o "$readonly" = "false" -o "$readonly" = "0" ] && rdo= 0
+sudo /usr/share/cgi-bin/_set_storage.sh $rdo > /dev/null 2>&1
 if [ $? -gt 0 ];
  then
   echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"

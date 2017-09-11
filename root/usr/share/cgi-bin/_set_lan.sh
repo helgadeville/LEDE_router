@@ -28,7 +28,15 @@ uci commit
 # named
 sed -n '1h;1!H;${;g;s/listen-on\s*{[^}]*}/listen-on { 127.0.0.1; '"$2"'; }/g;p;}' /etc/bind/named.conf > /etc/bind/_named.conf
 mv /etc/bind/_named.conf /etc/bind/named.conf
+sed 's/^router\..*/router\.\t14400\tIN\tA\t'"$2"'/' /etc/bind/db.router > /etc/bind/_db.router
+mv /etc/bind/_db.router /etc/bind/db.router
 # lighttpd
 sed -i "/^[[:space:]]*#/!s/server\.bind\s*=.*/server.bind = \""$2"\"/" /etc/lighttpd/lighttpd.conf
+# ftp
+if [ -f /etc/vsftpd.conf ];
+ then
+  sed 's/listen_address.*/listen_address='"$2"'/' /etc/vsftpd.conf > /etc/_vsftpd.conf
+  mv /etc/_vsftpd.conf /etc/vsftpd.conf
+fi
 # restart network
 lan=yes sudo -E /usr/share/cgi-bin/_restart.sh &

@@ -15,5 +15,5 @@ config 'mount'
         option enabled_fsck '0'
 
 config 'swap'
-        option device '/swapfile'
+        option device '/dev/sda2'
         option enabled '1'

@@ -1,9 +1,8 @@
 #!/bin/sh
-# upload root.tgz to /root
-#!/bin/sh
-dd if=/dev/zero of=/swapfile bs=1024 count=65536
-mkswap /swapfile
-swapon /swapfile
+MODEL=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*//'`
+MODEL_SHORT=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//'`
+mkswap /dev/sda2
+swapon /dev/sda2
 # perform copy
 cd /overlay
 mv root/* /root/
@@ -28,6 +27,8 @@ mkdir /etc/hotplug.d/button
 cp /root/etc/hotplug.d/button/* /etc/hotplug.d/button/
 # setup bind/named
 cp /root/etc/bind/named.conf /etc/bind
+cp /root/etc/bind/db.router /etc/bind
+echo -e "$MODEL_SHORT\t14400\tIN\tCNAME\trouter." >> /etc/bind/db.router
 cp /root/etc/config/dhcp /etc/config
 cp /root/etc/init.d/netwait /etc/init.d
 /etc/init.d/netwait enable
@@ -127,8 +128,48 @@ uci set system.led_wps=led
 uci set system.led_wps.name='WPS'
 uci set system.led_wps.sysfs='tp-link:green:wps'
 uci set system.led_wps.default=0
+# prepare SAMBA with default settings - if partition exists
+if [ -b /dev/sda3 ];
+ then
+  opkg install samba36-server samba36-client vsftpd
+  # prepare ftp
+  cp /root/etc/vsftpd.conf /etc
+  /etc/init.d/vsftpd enable
+  # prepare samba
+  uci set samba.@samba[0].name="$MODEL_SHORT"
+  uci set samba.@samba[0].workgroup='ROUTERS'
+  uci set samba.@samba[0].description='Router shared storage'
+  uci set samba.@samba[0].charset='UTF-8'
+  uci set samba.@samba[0].homes=0
+  uci set samba.@samba[0].interface='lan'
+  # share
+  uci add samba sambashare
+  uci set samba.@sambashare[-1].name='Storage'
+  uci set samba.@sambashare[-1].path='/storage/Storage'
+  uci set samba.@sambashare[-1].guest_ok=yes
+  uci set samba.@sambashare[-1].create_mask=666
+  uci set samba.@sambashare[-1].dir_mask=777
+  uci set samba.@sambashare[-1].read_only=no
+  # prepare storage
+  mkdir /storage
+  mount /dev/sda3 /storage
+  mkdir /storage/Storage
+  chmod 777 /storage/Storage
+  umount /dev/sda3
+  # enable samba
+  /etc/init.d/samba enable
+  # add storage to auto mount
+  uci add fstab mount
+  uci set fstab.@mount[-1].target='/storage'
+  uci set fstab.@mount[-1].device='/dev/sda3'
+  uci set fstab.@mount[-1].fstype='ext4'
+  uci set fstab.@mount[-1].options='rw,noatime'
+  uci set fstab.@mount[-1].enabled='1'
+  uci set fstab.@mount[-1].enabled_fsck='0'
+fi
+# FINAL COMMIT FOR UCI CHANGES !!!
 uci commit
-# configurations
+# CREATE configurations
 chmod 400 /root/password
 mkdir -p /root/configurations/custom 2> /dev/null
 chmod 755 /root/configurations/custom
@@ -144,6 +185,12 @@ find /usr/* -type f >> /tmp/_factory.list
 find /www/* -type f >> /tmp/_factory.list
 tar czf /root/configurations/factory.cgz -T /tmp/_factory.list > /dev/null 2>&1
 rm /tmp/_factory.list
+# CLEANUP ROOT
+rm -rf /root/etc
+rm /root/export.tgz
+rm -rf /root/patches
+rm -rf /root/sbin
+rm -rf /root/usr
 # REBOOT IS A GOOD IDEA NOW
 reboot
 

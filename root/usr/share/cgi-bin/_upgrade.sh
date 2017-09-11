@@ -21,6 +21,13 @@ fi
 rm _image.tgz
 if [ "$skip" = "no" ];
  then
+  # first script
+  if [ -f preinstall.sh ];
+   then
+    chmod +x preinstall.sh
+    ./preinstall.sh
+  fi
+
   # old files removal
   if [ -f "-" ];
    then
@@ -47,10 +54,18 @@ if [ "$skip" = "no" ];
     rm -rf /www/*
     mv export/* /www/
     rmdir export
-    mv export.tgz /root
+    rm export.tgz
   fi
   # VERSION setup
   [ -f version ] && mv version /www/
+
+  # postinstall
+  if [ -f postinstall.sh ];
+   then
+    chmod +x postinstall.sh
+    ./postinstall.sh
+  fi
+
 fi
 
 cd /
