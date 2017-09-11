@@ -10,7 +10,7 @@ if [ -z "$readonly" ];
   exit 1
 fi
 rdo=1
-[ "$readonly" = "no" -o "$readonly" = "false" -o "$readonly" = "0" ] && rdo= 0
+[ "$readonly" = "no" -o "$readonly" = "false" -o "$readonly" = "0" ] && rdo=0
 sudo /usr/share/cgi-bin/_set_storage.sh $rdo > /dev/null 2>&1
 if [ $? -gt 0 ];
  then
