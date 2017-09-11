@@ -4,7 +4,9 @@ MODEL_SHORT=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK
 mkswap /dev/sda2
 swapon /dev/sda2
 # perform copy
-cd /overlay
+# mount whichever device is appropriate /dev/sda1 or /dev/sda3
+mount /dev/sda3 /mnt
+cd /mnt
 mv root/* /root/
 rmdir root
 rm root.tgz
