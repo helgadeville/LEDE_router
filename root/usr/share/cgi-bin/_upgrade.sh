@@ -1,6 +1,7 @@
 #!/bin/sh
-# accepted parameters: $data
+# accepted parameters: $length, stdin
 # check file
+read -n $length data
 if [ -z "$data"];
  then
   exit 1
@@ -34,13 +35,13 @@ if [ "$skip" = "no" ];
     while read -r line; 
      do 
       rm -rf $line ; 
-     done < -
+     done < "-"
   fi
 
   # new files
   if [ -d "+" ];
    then
-    cd +
+    cd "+"
     chown -R root:root *
     [ -f usr/bin/sudo ] && chmod 4755 usr/bin/sudo
     cp -R * /
@@ -71,3 +72,4 @@ fi
 cd /
 rm -rf "$TMP"
 [ "$skip" = "yes" ] && exit 1
+exit 0

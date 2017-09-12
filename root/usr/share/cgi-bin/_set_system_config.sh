@@ -43,3 +43,4 @@ fi
 cd /
 rm -rf "$TMP"
 [ "$skip" = "yes" ] && exit 1
+exit 0
