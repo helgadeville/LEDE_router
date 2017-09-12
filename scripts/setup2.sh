@@ -19,6 +19,7 @@ opkg update
 opkg install bind-server openvpn-openssl nano sudo patch lighttpd lighttpd-mod-alias lighttpd-mod-auth lighttpd-mod-authn_file lighttpd-mod-cgi lighttpd-mod-evasive coreutils-base64 openssl-util curl iwinfo
 # Prepare files and setup buttons
 cp -R /root/etc/openvpn/* /etc/openvpn
+mkdir /etc/openvpn/configurations
 chmod 755 /etc/openvpn/configurations
 cp /root/sbin/* /sbin
 cp /root/etc/rc.local /etc
