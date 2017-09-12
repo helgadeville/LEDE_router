@@ -43,7 +43,6 @@ if [ "$skip" = "no" ];
    then
     cd "+"
     chown -R root:root *
-    [ -f usr/bin/sudo ] && chmod 4755 usr/bin/sudo
     cp -R * /
     cd ..
   fi
@@ -52,6 +51,7 @@ if [ "$skip" = "no" ];
   if [ -f export.tgz ];
    then
     tar xzf export.tgz
+    chown -R root:root export/*
     rm -rf /www/*
     mv export/* /www/
     rmdir export
