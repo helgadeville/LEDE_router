@@ -9,7 +9,7 @@ fi
 if [ "$1" = "0" ];
  then
   uci set samba.@sambashare[0].read_only='no'
-  sed 's/write_enable.*/write_enable=YES/ ; s/anon_upload_enable.*/anon_upload_enable=YES/ ; s/anon_mkdir_write_enable.*/anon_mkdir_write_enable=YES/ ; s/anon_other_write_enable.*/anon_other_write_enable=YES/ ; s/anon_world_readable_only.*/anon_world_readable_only=NO/' /etc/vsftpd.conf
+  sed 's/write_enable.*/write_enable=YES/ ; s/anon_upload_enable.*/anon_upload_enable=YES/ ; s/anon_mkdir_write_enable.*/anon_mkdir_write_enable=YES/ ; s/anon_other_write_enable.*/anon_other_write_enable=YES/ ; s/anon_world_readable_only.*/anon_world_readable_only=NO/' /etc/vsftpd.conf > /etc/_vsftpd.conf
  else
   uci set samba.@sambashare[0].read_only='yes'
   sed 's/write_enable.*/write_enable=NO/ ; s/anon_upload_enable.*/anon_upload_enable=NO/ ; s/anon_mkdir_write_enable.*/anon_mkdir_write_enable=NO/ ; s/anon_other_write_enable.*/anon_other_write_enable=NO/ ; s/anon_world_readable_only.*/anon_world_readable_only=YES/' /etc/vsftpd.conf > /etc/_vsftpd.conf

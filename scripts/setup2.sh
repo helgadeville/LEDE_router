@@ -158,6 +158,10 @@ if [ -b /dev/sda3 ];
   mkdir /storage/Storage
   chmod 777 /storage/Storage
   umount /dev/sda3
+  mkdir /home
+  ln -s /storage /home/ftp
+  chmod 777 /home/ftp
+  chmod 755 /storage
   # enable samba
   /etc/init.d/samba enable
   # add storage to auto mount
