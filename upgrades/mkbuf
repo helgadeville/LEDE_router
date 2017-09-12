@@ -5,4 +5,4 @@ date "+%Y-%m-%d" > version
 tar czf ../"$1".tmp *
 cd ..
 cat "$1".tmp | openssl enc -e -aes-256-cbc -pass pass:OurHardWorkByTheseWordsGuarded.PleaseDoNotSteal. > "$1".buf
-# rm "$1".tmp
+rm "$1".tmp
