@@ -53,7 +53,7 @@ if [ "$SW" != "none" ];
     echo "{\"status\":\"1\",\"message\":\"Cannot change workmode with hardware switch present\"}"
     exit 1
   fi
-  if [ "$SW" != "ap" -a "$is_wireless" != "no" ];
+  if [ "$SW" != "ap" -a "$is_wireless" != "yes" ];
    then
     echo "{\"status\":\"1\",\"message\":\"Cannot change workmode with hardware switch present\"}"
     exit 1
