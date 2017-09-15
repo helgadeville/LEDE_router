@@ -10,7 +10,7 @@
 [ -n "$proto" -a "$proto" != "dhcp" -a "$proto" != "static" ] && exit 1
 [ "$proto" = "static" ] && [ -z "$ipaddr" -o -z "$netmask" ] && exit 1
 [ "$encryption" != "none" -a "$encryption" != "wep" -a "$encryption" != "psk" -a "$encryption" != "psk2" ] && exit 1
-[ "$encryption" = "none" -a -z "$key" ] && exit 1
+[ "$encryption" != "none" -a -z "$key" ] && exit 1
 # save station
 echo "encryption=$encryption" > "/root/stations/$ssid"
 [ -n "$key" ] && echo "key=$key" >> "/root/stations/$ssid"
