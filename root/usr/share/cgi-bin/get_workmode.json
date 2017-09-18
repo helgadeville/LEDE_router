@@ -54,7 +54,7 @@ for dev in $wired
   _ipaddr=
   _netmask=
   _macaddr=
-  _origmac=`ifconfig eth0 | grep HWaddr | sed 's/.*HWaddr[[:space:]]*//'`
+  _origmac=`cat /sys/class/net/"$wired"/address`
   if [ "$WIREDWAN" = "$dev" ];
    then
     _proto=`uci get network.wan.proto 2> /dev/null`
