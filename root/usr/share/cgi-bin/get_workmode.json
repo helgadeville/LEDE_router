@@ -54,6 +54,7 @@ for dev in $wired
   _ipaddr=
   _netmask=
   _macaddr=
+  _origmac=`ifconfig eth0 | grep HWaddr | sed 's/.*HWaddr[[:space:]]*//'`
   if [ "$WIREDWAN" = "$dev" ];
    then
     _proto=`uci get network.wan.proto 2> /dev/null`
@@ -61,7 +62,7 @@ for dev in $wired
     _netmask=`uci get network.wan.netmask 2> /dev/null`
     _macaddr=`uci get network.wan.macaddr 2> /dev/null`
   fi
-  RET="$RET{\"ifname\":\"$dev\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"mac\":\"$_macaddr\"}"
+  RET="$RET{\"ifname\":\"$dev\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"hwaddr\":\"$_origmac\",\"mac\":\"$_macaddr\"}"
 done
 RET="$RET],\"wireless\":["
 # read networks of radio devices
@@ -79,6 +80,16 @@ for wifi in $wireless
   _ipaddr=
   _netmask=
   _macaddr=
+  _origmac=
+  _path=`uci get wireless."$wifi".path`
+  if [ -n "$_path" ];
+   then
+    _path1=/sys/devices/"$_path"/ieee80211/"$wifi"/macaddress
+    wifi2=`echo "$wifi" | sed 's/radio/phy/'`
+    _path2=/sys/devices/"$_path"/ieee80211/"$wifi2"/macaddress
+    [ -f "$_path1" ] && _origmac=`cat "$_path1"`
+    [ -f "$_path2" ] && _origmac=`cat "$_path2"`
+  fi
   if [ "$WIFIWAN" = "$wifi" ];
    then
     _proto=`uci get wireless.wan.proto 2> /dev/null`
@@ -90,7 +101,7 @@ for wifi in $wireless
     _key=`uci get wireless.wan.key 2> /dev/null`
     _disabled=`uci get wireless.wan.disabled 2> /dev/null`
   fi
-  RET="$RET{\"ifname\":\"$wifi\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"mac\":\"$_macaddr\",\"ssid\":\"$_ssid\",\"encryption\":\"$_encryption\",\"key\":\"$_key\",\"disabled\":\"$_disabled\"}"
+  RET="$RET{\"ifname\":\"$wifi\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"hwaddr\":\"$_origmac\",\"mac\":\"$_macaddr\",\"ssid\":\"$_ssid\",\"encryption\":\"$_encryption\",\"key\":\"$_key\",\"disabled\":\"$_disabled\"}"
 done
 #
 RET="$RET]}"

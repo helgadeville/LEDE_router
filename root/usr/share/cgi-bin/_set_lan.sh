@@ -39,4 +39,4 @@ if [ -f /etc/vsftpd.conf ];
   mv /etc/_vsftpd.conf /etc/vsftpd.conf
 fi
 # restart network
-lan=yes sudo -E /usr/share/cgi-bin/_restart.sh &
+sudo /usr/share/cgi-bin/_restart.sh &

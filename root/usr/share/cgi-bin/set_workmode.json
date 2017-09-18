@@ -94,23 +94,6 @@ if [ $result -gt 0 ];
  then
   echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
  else
-  # check reboot options
-  RBT=
-  if [ "$WIRED" = "$CURR_WIRED" ];
-   then
-    # if wired, then just update lan; if wifi, then just update wifi
-    if [ "$CURR_WIRED" = "yes" ];
-     then
-      RBT=cable
-     else
-      RBT=wifi
-    fi
-   else
-    # change from wired to wireless or from wireless to wired - full reboot required
-    RBT=full
-  fi
-  echo "{\"status\":\"0\",\"message\":\"OK\",\"reboot\":\"$RBT\"}"
-  [ "$RBT" = "cable" ] && sudo /usr/share/cgi-bin/_restart.sh &
-  [ "$RBT" = "wifi" ] && sudo /usr/share/cgi-bin/_restart.sh &
-  [ "$RBT" = "full" ] && sudo /usr/share/cgi-bin/_restart.sh &
+  echo "{\"status\":\"0\",\"message\":\"OK\"}"
+  sudo /usr/share/cgi-bin/_restart.sh &
 fi
