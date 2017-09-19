@@ -27,6 +27,7 @@ if [ "$skip" = "no" ];
    then
     chmod +x preinstall.sh
     ./preinstall.sh
+    [ $? -gt 0 ] && exit 1
   fi
 
   # old files removal
@@ -65,6 +66,7 @@ if [ "$skip" = "no" ];
    then
     chmod +x postinstall.sh
     ./postinstall.sh
+    [ $? -gt 0 ] && exit 1
   fi
 
 fi
