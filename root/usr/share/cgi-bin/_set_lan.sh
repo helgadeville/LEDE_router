@@ -15,6 +15,7 @@ if [ -z "$1" -o -z "$2" -o -z "$3" ] \
 fi
 #
 uci set network.$1.ipaddr=$2
+uci set uhttpd.main.listen_http="$2:80"
 #
 if [ -n "$USE_DHCP" ];
  then
@@ -30,8 +31,6 @@ sed -n '1h;1!H;${;g;s/listen-on\s*{[^}]*}/listen-on { 127.0.0.1; '"$2"'; }/g;p;}
 mv /etc/bind/_named.conf /etc/bind/named.conf
 sed 's/^router\..*/router\.\t14400\tIN\tA\t'"$2"'/' /etc/bind/db.router > /etc/bind/_db.router
 mv /etc/bind/_db.router /etc/bind/db.router
-# lighttpd
-sed -i "/^[[:space:]]*#/!s/server\.bind\s*=.*/server.bind = \""$2"\"/" /etc/lighttpd/lighttpd.conf
 # ftp
 if [ -f /etc/vsftpd.conf ];
  then
@@ -39,4 +38,4 @@ if [ -f /etc/vsftpd.conf ];
   mv /etc/_vsftpd.conf /etc/vsftpd.conf
 fi
 # restart network
-sudo /usr/share/cgi-bin/_restart.sh &
+sudo -b /usr/share/cgi-bin/_restart.sh

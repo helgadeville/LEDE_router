@@ -55,6 +55,7 @@ if [ "$skip" = "no" ];
     chown -R root:root export/*
     rm -rf /www/*
     mv export/* /www/
+    ln -s /usr/share/cgi-bin /www/cgi-bin
     rmdir export
     rm export.tgz
   fi

@@ -95,5 +95,5 @@ if [ $result -gt 0 ];
   echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
  else
   echo "{\"status\":\"0\",\"message\":\"OK\"}"
-  sudo /usr/share/cgi-bin/_restart.sh &
+  sudo -b /usr/share/cgi-bin/_restart.sh
 fi
