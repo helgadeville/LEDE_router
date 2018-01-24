@@ -1,5 +1,10 @@
 #!/bin/bash
 # usage: mkbuf file_to_make path_to_structured
+if [ -z "$1" -o -z "$2" ];
+ then
+  echo "This function requires two arguments: file_to_make directory_to_use"
+  exit 1
+fi
 cd $2
 date "+%Y-%m-%d" > version
 tar czf ../"$1".tmp *

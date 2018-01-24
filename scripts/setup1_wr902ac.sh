@@ -21,12 +21,13 @@ uci del network.wan6 2> /dev/null
 uci del network.wan.ifname 2> /dev/null
 uci del network.wan.disabled 2> /dev/null
 uci set wireless.wan=wifi-iface
-uci set wireless.wan.device=radio0
+uci set wireless.wan.device=radio1
 uci set wireless.wan.proto=dhcp
 uci set wireless.wan.network=wan
 uci set wireless.wan.mode=sta
 uci set wireless.wan.proto=dhcp
 uci del wireless.radio0.disabled 2> /dev/null
+uci del wireless.radio1.disabled 2> /dev/null
 uci set network.wan=interface
 uci set network.wan.proto=dhcp
 uci del wireless.wan.ipaddr 2> /dev/null
@@ -44,5 +45,10 @@ uci set wireless.default_radio0.disabled=1
 # or setup LEDE parameters
 uci set wireless.default_radio0.encryption='psk2'
 uci set wireless.default_radio0.key='...'
+uci set wireless.default_radio0.ssid='LEDE 5Ghz'
 uci del wireless.default_radio0.disabled 2> /dev/null
+uci set wireless.default_radio1.encryption='psk2'
+uci set wireless.default_radio1.key='LedePassw0rd'
+uci set wireless.default_radio1.ssid='LEDE 2.4GHz'
+uci del wireless.default_radio1.disabled 2> /dev/null
 uci commit

@@ -3,7 +3,8 @@ echo "Content-Type: application/json; charset=utf-8"
 echo ""
 if [ ! -d /storage/Storage ];
  then
-  echo "{\"status\":\"disabled\"}"  
+  echo "{\"status\":\"disabled\"}"
+  exit 1
 fi
 
 sudo /usr/share/cgi-bin/_get_storage.sh

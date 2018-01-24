@@ -1,22 +1,26 @@
 #!/bin/sh
 MODEL=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*//'`
-MODEL_SHORT=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//'`
+MODEL_SHORT=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//' ; s/ .*//`
 mkswap /dev/sda2
 swapon /dev/sda2
 # perform copy
 # mount whichever device is appropriate /dev/sda1 or /dev/sda3
 mount /dev/sda3 /mnt
+mv /overlay/root.tgz /mnt
+mv /overlay/export.tgz /mnt
 cd /mnt
+tar xzf root.tgz
 mv root/* /root/
 rmdir root
 rm root.tgz
+rm -rf lost+found
 mv export.tgz /root
 cd /root
 # MUST HAVE INTERNET
 echo INTERNET REQUIRED HERE !!!!!!
 # Install some fancy packages for initial VPN setup
 opkg update
-opkg install bind-server openvpn-openssl nano sudo patch uhttpd coreutils-base64 openssl-util curl iwinfo
+opkg install bind-server openvpn-openssl nano sudo patch uhttpd coreutils-base64 openssl-util curl iwinfo swconfig
 # Prepare files and setup buttons
 cp -R /root/etc/openvpn/* /etc/openvpn
 mkdir /etc/openvpn/configurations
@@ -119,7 +123,7 @@ uci del wireless.default_radio0.key 2> /dev/null
 uci del wireless.default_readio0.disabled 2> /dev/null
 # additional setup for AP + STA
 uci set wireless.wan=wifi-iface
-uci set wireless.wan.device=radio0
+uci set wireless.wan.device=radio1
 uci set wireless.wan.proto=dhcp
 uci set wireless.wan.network=wan
 uci set wireless.wan.mode=sta

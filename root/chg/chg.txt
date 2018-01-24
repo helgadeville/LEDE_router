@@ -1,0 +1,7 @@
+/etc/rc.button/wps
+/usr/share/cgi-bin/welcome.json
+/usr/share/cgi-bin/_ap_on.sh
+removed /etc/rc.button/rfkill_old
+/sbin/checkswitch
+/sbin/modechange
+/etc/openvpn/led
