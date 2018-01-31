@@ -37,6 +37,7 @@ uci del network.wan.netmask 2> /dev/null
 uci set network.lan.ifname=eth0
 # set whatever SID and KEY is here
 uci set wireless.wan.ssid='...'
+# psk2 for WPA
 uci set wireless.wan.encryption='...'
 uci set wireless.wan.key='...'
 uci del wireless.wan.disabled 2> /dev/null
@@ -44,7 +45,7 @@ uci del wireless.wan.disabled 2> /dev/null
 uci set wireless.default_radio0.disabled=1
 # or setup LEDE parameters
 uci set wireless.default_radio0.encryption='psk2'
-uci set wireless.default_radio0.key='...'
+uci set wireless.default_radio0.key='LedePassw0rd'
 uci set wireless.default_radio0.ssid='LEDE 5Ghz'
 uci del wireless.default_radio0.disabled 2> /dev/null
 uci set wireless.default_radio1.encryption='psk2'

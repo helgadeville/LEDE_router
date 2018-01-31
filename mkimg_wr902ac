@@ -1,0 +1,2 @@
+#!/bin/bash
+make image PROFILE=tl-wr902ac-v1 PACKAGES="kmod-usb-storage kmod-scsi-core kmod-fs-ext4 block-mount bind-server openvpn-openssl sudo nano patch uhttpd coreutils-base64 openssl-util curl iwinfo swconfig"
