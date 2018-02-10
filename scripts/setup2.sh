@@ -1,22 +1,26 @@
 #!/bin/sh
 MODEL=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*//'`
-MODEL_SHORT=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//'`
+MODEL_SHORT=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*//' ; s/ .*//`
 mkswap /dev/sda2
 swapon /dev/sda2
 # perform copy
 # mount whichever device is appropriate /dev/sda1 or /dev/sda3
 mount /dev/sda3 /mnt
+mv /overlay/root.tgz /mnt
+mv /overlay/export.tgz /mnt
 cd /mnt
+tar xzf root.tgz
 mv root/* /root/
 rmdir root
 rm root.tgz
+rm -rf lost+found
 mv export.tgz /root
 cd /root
 # MUST HAVE INTERNET
 echo INTERNET REQUIRED HERE !!!!!!
 # Install some fancy packages for initial VPN setup
 opkg update
-opkg install bind-server openvpn-openssl nano sudo patch lighttpd lighttpd-mod-alias lighttpd-mod-auth lighttpd-mod-authn_file lighttpd-mod-cgi lighttpd-mod-evasive coreutils-base64 openssl-util curl iwinfo
+opkg install openvpn-openssl nano sudo patch uhttpd coreutils-base64 openssl-util curl iwinfo swconfig
 # Prepare files and setup buttons
 cp -R /root/etc/openvpn/* /etc/openvpn
 mkdir /etc/openvpn/configurations
@@ -28,10 +32,6 @@ mv /etc/rc.button/rfkill /etc/rc.button/rfkill_old
 cp /root/etc/rc.button/* /etc/rc.button/
 mkdir /etc/hotplug.d/button
 cp /root/etc/hotplug.d/button/* /etc/hotplug.d/button/
-# setup bind/named
-cp /root/etc/bind/named.conf /etc/bind
-cp /root/etc/bind/db.router /etc/bind
-echo -e "$MODEL_SHORT\t14400\tIN\tCNAME\trouter." >> /etc/bind/db.router
 cp /root/etc/config/dhcp /etc/config
 cp /root/etc/init.d/netwait /etc/init.d
 /etc/init.d/netwait enable
@@ -79,20 +79,18 @@ uci set dropbear.@dropbear[0].Interface=lan
 /etc/init.d/openvpn disable
 /etc/init.d/openvpn stop
 # http server et al
-echo Now preparing lighttpd
+echo Now preparing uhttpd
 # patching some stuff
 patch /etc/init.d/openvpn /root/patches/openvpn.patch
 patch /lib/functions/procd.sh /root/patches/procd.sh.patch
 # GUI
 echo Now preparing GUI
-rmdir /etc/lighttpd/conf.d
 rm /etc/sudoers.d 2> /dev/null
 mkdir /etc/sudoers.d
 cp /root/etc/sudoers.d/http /etc/sudoers.d
-cp /root/etc/lighttpd/lighttpd.conf /etc/lighttpd
-cp /root/etc/lighttpd/.htdigest /etc/lighttpd
-chmod +r /etc/lighttpd/.htdigest
-rm -rf /etc/lighttpd/conf.d
+echo "A:*" > /etc/httpd.conf
+echo "/:admin:\$p\$root" >> /etc/httpd.conf
+uci del uhttpd.main.listen_https 2> /dev/null
 mkdir -p /usr/share/cgi-bin
 cp /root/usr/share/cgi-bin/* /usr/share/cgi-bin
 chmod 555 /usr/share/cgi-bin/*
@@ -107,8 +105,9 @@ rm -rf /www/*
 mv export/* /www
 cd /
 rm -rf /tmp/export
+ln -s /usr/share/cgi-bin /www/cgi-bin
 # restart server
-/etc/init.d/lighttpd enable
+/etc/init.d/uhttpd enable
 # setup configurations and stations
 mkdir /root/stations
 echo "OurHardWorkByTheseWordsGuarded.PleaseDoNotSteal." /root/password
@@ -120,7 +119,7 @@ uci del wireless.default_radio0.key 2> /dev/null
 uci del wireless.default_readio0.disabled 2> /dev/null
 # additional setup for AP + STA
 uci set wireless.wan=wifi-iface
-uci set wireless.wan.device=radio0
+uci set wireless.wan.device=radio1
 uci set wireless.wan.proto=dhcp
 uci set wireless.wan.network=wan
 uci set wireless.wan.mode=sta
@@ -175,6 +174,7 @@ if [ -b /dev/sda3 ];
   uci set fstab.@mount[-1].enabled_fsck='0'
 fi
 # FINAL COMMIT FOR UCI CHANGES !!!
+uci set system.version='1.4'
 uci commit
 # CREATE configurations
 chmod 400 /root/password
