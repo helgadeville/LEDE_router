@@ -1,4 +1,4 @@
-#!/bin/sn
+#!/bin/sh
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
 peer=`uci get network.wan.peerdns 2> /dev/null`
