@@ -19,18 +19,15 @@ uci set uhttpd.main.listen_http="$2:80"
 #
 if [ -n "$USE_DHCP" ];
  then
-  uci set dhcp.lan.dhcp_option=6,$2
+  uci del dhcp.lan.dhcp_option > /dev/null 2>&1
+  uci add_list dhcp.lan.dhcp_option="3,$2"
+  uci add_list dhcp.lan.dhcp_option="6,$2"
   uci set dhcp.lan.start=$4
   uci set dhcp.lan.limit=$5
 fi
 #
 uci commit
 # those services must be rewritten manually
-# named
-sed -n '1h;1!H;${;g;s/listen-on\s*{[^}]*}/listen-on { 127.0.0.1; '"$2"'; }/g;p;}' /etc/bind/named.conf > /etc/bind/_named.conf
-mv /etc/bind/_named.conf /etc/bind/named.conf
-sed 's/^router\..*/router\.\t14400\tIN\tA\t'"$2"'/' /etc/bind/db.router > /etc/bind/_db.router
-mv /etc/bind/_db.router /etc/bind/db.router
 # ftp
 if [ -f /etc/vsftpd.conf ];
  then

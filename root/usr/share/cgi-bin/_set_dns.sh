@@ -1,13 +1,13 @@
 #!/bin/sh
-# usage: /usr/share/cgi-bin/_set_dns.sh $dns1 $dns2
-# check parameters
-[ -z $1 ] && exit 1
-DNS="$1;"
-[ -n "$2" ] && DNS="$DNS $2;"
-sed -n '1h;1!H;${;g;s/forwarders\s*{[^}]*}/forwarders { '"$DNS"' }/g;p;}' /etc/bind/named.conf > /etc/bind/_named.conf
-if [ $? -gt 0 ];
+[ -z "$peer" -a -z "$dns1" -a -z "$dns2" ] && exit 1
+if [ -z "$peer" ];
  then
-  exit 1
+  uci set network.wan.peerdns='0'
+ else
+  uci del network.wan.peerdns > /dev/null 2>&1
 fi
-mv /etc/bind/_named.conf /etc/bind/named.conf
-/etc/init.d/named restart
+uci del network.wan.dns > /dev/null 2>&1
+[ -n "$dns1" ] && uci add_list network.wan.dns="$dns1"
+[ -n "$dns2" ] && uci add_list network.wan.dns="$dns2"
+uci commit
+

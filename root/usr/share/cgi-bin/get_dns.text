@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/sn
 echo "Content-Type: text/plain; charset=utf-8"
 echo ""
-#awk '/forwarders/,/}/' /etc/bind/named.conf | sed 's/[[:space:]]*// ; s/;$// ; s/forwarders.*{//; s/}$//;' | grep -v '^$'
-awk '/forwarders/,/}/' /etc/bind/named.conf | grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0
--9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"
+peer=`uci get network.wan.peerdns 2> /dev/null`
+[ -z "$peer" -o "$peer" = "1" ] && echo peer
+dnss=`uci get network.wan.dns`
+for dns in $dnss; do echo "$dns"; done
