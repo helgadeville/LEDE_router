@@ -176,6 +176,8 @@ fi
 # FINAL COMMIT FOR UCI CHANGES !!!
 uci set system.version='1.4'
 uci commit
+# set registry
+iw reg set 00
 # CREATE configurations
 chmod 400 /root/password
 mkdir -p /root/configurations/custom 2> /dev/null

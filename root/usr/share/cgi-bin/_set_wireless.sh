@@ -42,6 +42,8 @@ if [ "$hidden" = "true" -o "$hidden" = "yes" -o "$hidden" = "1" ];
  else
   uci del wireless.$iface.hidden > /dev/null 2>&1
 fi
+# enable channels
+uci set wireless.$iface.country='00'
 #
 uci commit
 # do something only when radio enabled
