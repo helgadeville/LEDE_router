@@ -177,7 +177,11 @@ fi
 uci set system.version='1.4'
 uci commit
 # set registry
-iw reg set 00
+RD=`uci show wireless | grep 'wifi-device' | sed 's/wireless\.//' | sed 's/=wifi-device//'`
+for radio in $RD
+ do
+  uci set wireless.$radio.country='00'
+done
 # CREATE configurations
 chmod 400 /root/password
 mkdir -p /root/configurations/custom 2> /dev/null
