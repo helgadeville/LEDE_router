@@ -1,0 +1,21 @@
+#!/bin/sh
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+RET="{\"status\":\"0\",\"message\":\"OK\",\"data\":["
+comma=
+for file in /root/stations/*
+ do
+  ssid=`echo $file | sed 's/\/root\/stations\/// ; s/"/\\\\"/g'`
+  if [ -n "$ssid" -a "$ssid" != "*" ];
+   then
+    RET="$RET$comma{\"ssid\":\"$ssid\""
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+      json=`echo $line | sed 's/"/\\\\"/g ; s/^\([^=]*\)=\(.*\)/"\1":"\2"/'`
+      [ -n $json ] && RET="$RET,$json"
+    done < "$file"
+    RET="$RET}"
+    comma=","
+  fi
+done
+RET="$RET]}"
+echo $RET

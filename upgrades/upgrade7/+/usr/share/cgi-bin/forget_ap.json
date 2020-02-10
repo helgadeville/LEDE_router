@@ -1,0 +1,7 @@
+#!/bin/sh
+# include POST/GET READER
+. /usr/share/cgi-bin/request
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+ssid="$ssid" sudo -E /usr/share/cgi-bin/_forget_ap.sh > /dev/null 2>&1
+echo "{\"status\":\"0\",\"message\":\"OK\"}"

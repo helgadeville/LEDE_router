@@ -1,0 +1,129 @@
+#!/bin/sh
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+RET="{\"selected\":"
+# get selected device
+SELECTED=
+IFDEVICE=
+WIREDWAN=`uci get network.wan.ifname 2> /dev/null`
+WIREDWAND=`uci get network.wan.disabled 2> /dev/null`
+WIFIWAN=`uci get wireless.wan.device 2> /dev/null`
+WIFIWAND=`uci get wireless.wan.disabled 2> /dev/null`
+if [ -n "$WIREDWAN" -a "$WIREDWAND" != "1" ];
+ then
+  SELECTED="$WIREDWAN"
+  IFDEVICE=$SELECTED
+ else
+  if [ -n "$WIFIWAN" -a "$WIFIWAND" != "1" ];
+   then
+    SELECTED="$WIFIWAN"
+    IFDEVICE=`ifstatus wan | grep "\"device\":" | cut -d ' ' -f2 | cut -d '"' -f2`
+  fi
+fi
+# get IP address and netmask of selected
+WANIP=`ifconfig $IFDEVICE | grep "inet addr" | cut -d: -f2 | cut -d ' ' -f1`
+WANMASK=`ifconfig $IFDEVICE | grep "Mask" | cut -d: -f4`
+# start constructing answer
+RET="$RET\"$SELECTED\","
+# get list of ethernet non-switch devices and radio devices
+switch=`swconfig list | sed 's/Found.*-[*[:space:]]//'`
+if [ -n "$switch" ];
+ then
+  wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
+ else
+  wired=`ls -d /sys/class/net/eth* | sed 's/\/sys\/class\/net\///'`
+fi
+wireless=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
+# check switch position - for AP, only wired can pass
+# for WISP and 3G, only wireless can pass
+SW=`sudo /usr/share/cgi-bin//_checkswitch.sh 2> /dev/null`
+if [ "$SW" = "ap" ];
+ then
+  wireless=
+fi
+if [ "$SW" = "wisp" -o "$SW" = "3g" ];
+ then
+  wired=
+fi
+# read networks of ethernet devices
+RET="$RET\"wired\":["
+wired_networks=
+comma=no
+for dev in $wired
+ do
+  if [ "$comma" = "no" ];
+   then
+    comma=yes
+   else
+    RET="$RET,"
+  fi
+  _proto=dhcp
+  _ipaddr=
+  _netmask=
+  _macaddr=
+  _gateway=
+  _origmac=`cat /sys/class/net/"$wired"/address`
+  [ -n "$_origmac" ] && _macaddr=$_origmac
+  if [ "$WIREDWAN" = "$dev" ];
+   then
+    _proto=`uci get network.wan.proto 2> /dev/null`
+    [ -z "$_proto" ] && _proto=dhcp
+    _ipaddr=`uci get network.wan.ipaddr 2> /dev/null`
+    [ -z "$_ipaddr" ] && _ipaddr=$WANIP
+    _netmask=`uci get network.wan.netmask 2> /dev/null`
+    [ -z "$_netmask" ] && _netmask=$WANMASK
+    _macaddr=`uci get network.wan.macaddr 2> /dev/null`
+    [ -n "$_origmac" ] && _macaddr=$_origmac
+    _gateway=`uci get network.wan.gateway 2> /dev/null`
+  fi
+  RET="$RET{\"ifname\":\"$dev\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"hwaddr\":\"$_origmac\",\"mac\":\"$_macaddr\",\"gateway\":\"$_gateway\"}"
+done
+RET="$RET],\"wireless\":["
+# read networks of radio devices
+comma=no
+wifi_networks=
+for wifi in $wireless
+ do
+  if [ "$comma" = "no" ];
+   then
+    comma=yes
+   else
+    RET="$RET,"
+  fi
+  _proto=dhcp
+  _ipaddr=
+  _netmask=
+  _macaddr=
+  _gateway=
+  _origmac=
+  _path=`uci get wireless."$wifi".path`
+  if [ -n "$_path" ];
+   then
+    _path1=/sys/devices/"$_path"/ieee80211/"$wifi"/macaddress
+    wifi2=`echo "$wifi" | sed 's/radio/phy/'`
+    _path2=/sys/devices/"$_path"/ieee80211/"$wifi2"/macaddress
+    [ -f "$_path1" ] && _origmac=`cat "$_path1"`
+    [ -f "$_path2" ] && _origmac=`cat "$_path2"`
+  fi
+  [ -n "$_origmac" ] && _macaddr=$_origmac
+  if [ "$WIFIWAN" = "$wifi" ];
+   then
+    _proto=`uci get network.wan.proto 2> /dev/null`
+    [ -z "$_proto" ] && _proto=dhcp
+    _ipaddr=`uci get network.wan.ipaddr 2> /dev/null`
+    [ -z "$_ipaddr" ] && _ipaddr=$WANIP
+    _netmask=`uci get network.wan.netmask 2> /dev/null`
+    [ -z "$_netmask" ] && _netmask=$WANMASK
+    _macaddr=`uci get wireless.wan.macaddr 2> /dev/null`
+    [ -n "$_origmac" ] && _macaddr=$_origmac
+    _gateway=`uci get network.wan.gateway 2> /dev/null`
+    _ssid=`uci get wireless.wan.ssid 2> /dev/null`
+    _encryption=`uci get wireless.wan.encryption 2> /dev/null`
+    _key=`uci get wireless.wan.key 2> /dev/null`
+    _disabled=`uci get wireless.wan.disabled 2> /dev/null`
+  fi
+  RET="$RET{\"ifname\":\"$wifi\",\"proto\":\"$_proto\",\"ip\":\"$_ipaddr\",\"mask\":\"$_netmask\",\"hwaddr\":\"$_origmac\",\"mac\":\"$_macaddr\",\"gateway\":\"$_gateway\",\"ssid\":\"$_ssid\",\"encryption\":\"$_encryption\",\"key\":\"$_key\",\"disabled\":\"$_disabled\"}"
+done
+#
+RET="$RET]}"
+echo "$RET"
