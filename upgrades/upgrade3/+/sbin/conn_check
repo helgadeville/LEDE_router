@@ -1,0 +1,23 @@
+#!/bin/sh
+# check existence of internet leds
+LED=
+# TL-MR3020 TL-MR3220 TL-MR3420
+[ -e "/sys/class/leds/tp-link:green:3g" ] && LED="/sys/class/leds/tp-link:green:3g"
+# TL-WR902AC
+[ -e "/sys/class/leds/tl-wr902ac-v1:green:internet" ] && LED="/sys/class/leds/tl-wr902ac-v1:green:internet"
+
+# if no internet leds found, exit
+[ -z "$LED" ] && exit 1
+
+while true; do
+ GW=`ip r | grep default | cut -d ' ' -f 3`
+ [ -n "$GW" ] && ping -q -w 1 -c 1 "$GW" > /dev/null 2>&1
+
+ if [ -n "$GW" -a $? -eq 0 ]; then
+  echo 1 > "$LED/brightness"
+ else
+  echo 0 > "$LED/brightness"
+ fi
+
+ sleep 3
+done

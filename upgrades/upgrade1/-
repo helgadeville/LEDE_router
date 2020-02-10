@@ -1,0 +1,8 @@
+/usr/share/cgi-bin/_ap_on.sh
+/usr/share/cgi-bin/_reboot.sh
+/usr/share/cgi-bin/_save_current_config.sh
+/usr/share/cgi-bin/_set_lan.sh
+/usr/share/cgi-bin/_upgrade.sh
+/usr/share/cgi-bin/restart.json
+/usr/share/cgi-bin/get_workmode.json
+/usr/share/cgi-bin/set_workmode.json

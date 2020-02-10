@@ -1,0 +1,37 @@
+#!/bin/sh
+if ! grep -qe "sw\d.* in" /sys/kernel/debug/gpio ; then 
+ echo none
+ exit 0
+fi
+MODEL=`cat /proc/cpuinfo | grep machine | sed 's/^[^:]*:[ ]*// ; s/TP-LINK[ ]*// ; s/ .*//'`
+if grep -qe "sw2.*in  hi" /sys/kernel/debug/gpio ; then
+ if grep -qe "sw1.*in  hi" /sys/kernel/debug/gpio ; then
+  # AP or 3G
+  if [ "$MODEL" = "TL-MR3020" ]; then
+   echo ap
+  elif [ "$MODEL" = "TL-WR902AC" ]; then
+   echo 3g
+  else
+   echo ap
+  fi
+ else
+  # WISP
+  if [ "$MODEL" = "TL-MR3020" ]; then
+   echo wisp
+  elif [ "$MODEL" = "TL-WR902AC" ]; then
+   echo wisp
+  else
+   echo wisp
+  fi
+ fi
+else
+ # 3G or AP
+ if [ "$MODEL" = "TL-MR3020" ]; then
+  echo 3g
+ elif [ "$MODEL" = "TL-WR902AC" ]; then
+  echo ap
+ else
+  echo 3g
+ fi
+fi
+

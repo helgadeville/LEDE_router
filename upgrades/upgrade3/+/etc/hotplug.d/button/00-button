@@ -1,0 +1,9 @@
+#!/bin/sh
+prv=`uci get wireless.wan._mode`
+sw=`checkswitch`
+if [ "$sw" != "$prv" ];
+ then
+  uci set wireless.wan._mode=$sw
+  uci commit
+  ACTION='released' "/etc/rc.button/$sw"
+fi

@@ -1,0 +1,21 @@
+#!/bin/sh
+# accepted parameters: $file
+# include POST/GET READER
+. /usr/share/cgi-bin/request
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+# check file
+if [ -z "$file" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  exit 1
+fi
+# restore
+file="$file" sudo -E /usr/share/cgi-bin/_set_system_config.sh > /dev/null 2>&1
+if [ $? -gt 0 ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Error on restoring configuration\"}"
+ else
+  sudo -b /usr/share/cgi-bin/_reboot.sh > /dev/null 2>&1
+  echo "{\"status\":\"0\",\"message\":\"OK\"}"
+fi

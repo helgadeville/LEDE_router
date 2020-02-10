@@ -1,0 +1,11 @@
+#!/bin/sh
+echo "Content-Type: text/plain; charset=utf-8"
+echo ""
+VERSION=`uci get system.version`
+[ -n "$VERSION" ] && echo "Version: $VERSION"
+[ -f /www/version ] && cat /www/version
+cat /etc/banner
+echo ""
+free
+echo ""
+df -h

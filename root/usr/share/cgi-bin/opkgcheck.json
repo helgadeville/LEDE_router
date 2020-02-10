@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+PKGS=`sudo /usr/share/cgi-bin/_opkgcheck.sh 2> /dev/null`
+echo "{\"status\":\"$PKGS\"}"

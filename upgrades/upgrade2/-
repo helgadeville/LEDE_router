@@ -1,0 +1,13 @@
+/usr/share/cgi-bin/_restart.sh
+/usr/share/cgi-bin/_upgrade.sh
+/usr/share/cgi-bin/set_password.json
+/usr/share/cgi-bin/upload_system_config.json
+/usr/share/cgi-bin/_save_current_config.sh
+/usr/share/cgi-bin/get_user_name.json
+/usr/share/cgi-bin/set_system_config.json
+/usr/share/cgi-bin/_set_lan.sh
+/usr/share/cgi-bin/reboot.json
+/usr/share/cgi-bin/set_workmode.json
+/usr/share/cgi-bin/_set_password.sh
+/usr/share/cgi-bin/restart.json
+/usr/share/cgi-bin/upgrade.json

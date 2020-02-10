@@ -1,0 +1,99 @@
+#!/bin/sh
+# accepted parameters: $device $ssid $encryption $proto, optional $enable $key $mac
+# include POST/GET READER
+. /usr/share/cgi-bin/request
+echo "Content-Type: application/json; charset=utf-8"
+echo ""
+# check device
+if [ -z "$device" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  exit 1
+fi
+# get selected device and check whether wired or not
+SELECTED=
+WIRED=
+WIREDWAN=`uci get network.wan.ifname 2> /dev/null`
+WIREDWAND=`uci get network.wan.disabled 2> /dev/null`
+WIFIWAN=`uci get wireless.wan.device 2> /dev/null`
+WIFIWAND=`uci get wireless.wan.disabled 2> /dev/null`
+if [ -n "$WIREDWAN" -a "$WIREDWAND" != "1" ];
+ then
+  SELECTED="$WIREDWAN"
+  WIRED=yes
+ else
+  if [ -n "$WIFIWAN" -a "$WIFIWAND" != "1" ];
+   then
+    SELECTED="$WIFIWAN"
+    WIRED=no
+  fi
+fi
+# setup - read interfaces
+switch=`swconfig list | sed 's/Found.*-[*[:space:]]//'`
+if [ -n "$switch" ];
+ then
+  wired=`ls -d /sys/class/net/eth* | grep -v "$switch" | sed 's/\/sys\/class\/net\///'`
+ else
+  wired=`ls -d /sys/class/net/eth* | sed 's/\/sys\/class\/net\///'`
+fi
+# create one line
+wired=`echo $wired`
+wireless=`uci show wireless | grep wifi-device | sed 's/wireless\.// ; s/=.*//'`
+is_wireless=no
+for wifi in $wireless
+ do
+  [ "$wifi" = "$device" ] && is_wireless=yes
+done
+# check if hardware switch present and if so check if proper workmode selected
+SW=`sudo /usr/share/cgi-bin/_checkswitch.sh 2> /dev/null`
+if [ "$SW" != "none" ];
+ then
+  if [ "$SW" = "ap" -a "$is_wireless" = "yes" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"Cannot change workmode with hardware switch present\"}"
+    exit 1
+  fi
+  if [ "$SW" != "ap" -a "$is_wireless" != "yes" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"Cannot change workmode with hardware switch present\"}"
+    exit 1
+  fi
+fi
+if [ -n "$proto" -a "$proto" != "dhcp" -a "$proto" != "static" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Bad proto value\"}"
+fi
+[ "$proto" = "static" ] && if [ -z "$ipaddr" -o -z "$netmask" ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  exit 1
+fi
+CURR_WIRED=
+if [ "$is_wireless" = "yes" ];
+ then
+  # wireless, check parameters and call _ap_on.sh
+  if [ -z "$ssid" -o -z "$encryption" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+    exit 1
+  fi
+  if [ "$encryption" != "none" -a -z "$key" ];
+   then
+    echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
+  fi
+  wired="$wired" switch="$switch" device="$device" ssid="$ssid" encryption="$encryption" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" key="$key" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_on.sh > /dev/null 2>&1
+  result=$?
+  CURR_WIRED=no
+ else
+  # not wireless, call _ap_off.sh
+  wired="$wired" switch="$switch" device="$device" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_off.sh > /dev/null 2>&1
+  result=$?
+  CURR_WIRED=yes
+fi
+if [ $result -gt 0 ];
+ then
+  echo "{\"status\":\"1\",\"message\":\"Bad or missing parameters\"}"
+ else
+  echo "{\"status\":\"0\",\"message\":\"OK\"}"
+  sudo -b /usr/share/cgi-bin/_restart.sh
+fi

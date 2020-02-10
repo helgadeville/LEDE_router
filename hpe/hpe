@@ -1,0 +1,183 @@
+#!/bin/sh
+# check if in "getpass mode"
+if [ -n "$1" ]
+ then
+  if [ "$1" != "getpass" -a "$1" != "prepare" -a "$1" != "status" ]
+   then
+    echo "Only 'status', 'getpass' and 'prepare' options are supported"
+    exit 1
+  fi
+  if [ "$1" = "getpass" ]
+   then
+    pass=`uci get network.hpe.otp 2> /dev/null`
+    if [ -z "$pass" ];
+     then
+      logger OTP password NOT found
+      ifdown hpe
+      exit 0
+    fi
+    uci del network.hpe.otp > /dev/null 2>&1
+    uci commit
+    echo "$pass"
+    exit 0
+  fi
+  if [ "$1" = "prepare" ]
+   then
+    openconnect=`opkg list-installed | grep openconnect`
+    if [ -z "$openconnect" ]
+     then
+      opkg update
+      opkg install openconnect
+      if [ $? -gt 0]
+       then
+        echo Installing openconnect failed, cannot continue
+        exit 1
+      fi
+    fi
+    # setup interface
+    uci del network.hpe 2>&1 > /dev/null
+    uci set network.hpe=interface
+    uci set network.hpe.auto='0'
+    uci set network.hpe.proto='openconnect'
+    uci set network.hpe.interface='wan'
+    uci set network.hpe.server='germany.remoteaccess.hp.com'
+    uci set network.hpe.serverhash='9E142CE1392F392B5FB625993B1FE7609766B666'
+    uci set network.hpe.defaultroute='0'
+    uci set network.hpe.authgroup='OATH'
+    uci set network.hpe.token_mode='script'
+    uci set network.hpe.juniper='1'
+    # check firewall zones, remove old ones
+    a=1
+    while [ true ]
+     do
+      zone=`uci get firewall.@zone[$a].name 2> /dev/null`
+      fwd=`uci get firewall.@forwarding[$a].dest 2> /dev/null`
+      [ -z "$zone" -a -z "$fwd" ] && break
+      [ -n "$zone" -a "$zone" = "hpe" ] && uci del firewall.@zone[$a] 2>&1 > /dev/null
+      [ -n "$fwd" -a "$fwd" = "hpe" ] && uci del firewall.@forwarding[$a] 2>&1 > /dev/null
+      a=`expr $a + 1`
+    done
+    # a new firewall zone (for HPE):
+    uci add firewall zone
+    uci set firewall.@zone[-1].name=hpe
+    uci set firewall.@zone[-1].input=REJECT
+    uci set firewall.@zone[-1].output=ACCEPT
+    uci set firewall.@zone[-1].forward=REJECT
+    uci set firewall.@zone[-1].masq=1
+    uci set firewall.@zone[-1].mtu_fix=1
+    uci add_list firewall.@zone[-1].network=hpe
+    echo Enable forwarding
+    # enable forwarding from LAN to VPN:
+    uci add firewall forwarding
+    uci set firewall.@forwarding[-1].src=lan
+    uci set firewall.@forwarding[-1].dest=hpe
+    uci commit
+    /etc/init.d/network restart
+    echo "Connection hpe is all set."
+    exit 0
+  fi
+  if [ "$1" = "status" ]
+   then
+    active=`ifconfig | grep vpn-hpe`
+    if [ -n "$active" ]
+     then
+      echo Connection active.
+     else
+      echo Connection down.
+    fi
+    exit 0
+  fi
+fi
+# check if config exists
+hasnet=`uci get network.hpe 2> /dev/null`
+if [ -z "$hasnet" -o "$hasnet" != "interface" ]
+ then
+  echo VPN Connection has not been configured yet, use 'prepare' option
+  exit 1
+fi
+# check if is ok
+active=`ifconfig | grep vpn-hpe`
+if [ -n "$active" ]
+ then
+  echo "This connection is already active, do you want to terminate ? (y/[n]):"
+  read -r resolv
+  if [ "$resolv" = "y" -o "$resolv"="yes" ]
+   then
+    echo "Bringing down connection"
+    ifdown hpe
+    i=1
+    while [ true ]
+     do
+      active=`ifconfig | grep vpn-hpe`
+      [ -z "$active" -o $i -gt 60 ] && break
+      i=`expr $i + 1`
+      sleep 1
+    done
+    if [ -n "$active" ]
+     then
+      echo Could not bring down this connection.
+     else
+      echo Connection down.
+    fi
+   fi
+  exit 0
+fi
+currname=`uci get network.hpe.username 2> /dev/null`
+echo "Username [$currname]:"
+read -r username
+[ -z "$username" ] && username="$currname"
+if [ -z "$username" ]
+ then
+  echo You must provide username
+  exit 1
+fi
+currsecret=`uci get network.hpe.secret 2> /dev/null`
+if [ -z "$currsecret" ]
+ then
+  echo "PIN:"
+ else
+  echo "PIN [$currsecret]:"
+fi
+read -r secret
+[ -z "$secret" ] && secret="$currsecret"
+if [ -z "$secret" ]
+ then
+  echo You must provide PIN
+  exit 1
+fi
+echo Password:
+read -r password
+if [ -z "$password" ];
+ then
+  echo You must provide password
+  exit 1
+fi
+echo Please wait, trying to connect
+SCRIPTPATH=$(readlink -f $0)
+uci set network.hpe.username="$username"
+uci set network.hpe.secret="$secret"
+uci set network.hpe.otp="$secret$password"
+uci set network.hpe.token_script="$SCRIPTPATH getpass"
+uci commit
+ifup hpe
+while [ true ]
+ do
+  otp=`uci get network.hpe.otp 2> /dev/null`
+  [ -z "$otp" ] && break
+  sleep 1
+done
+i=1
+while [ true ]
+ do
+  active=`ifconfig | grep vpn-hpe`
+  [ -n "$active" -o $i -gt 60 ] && break
+  i=`expr $i + 1`
+  sleep 1
+done
+if [ -n "$active" ]
+ then
+  echo Connected
+ else
+  ifdown hpe
+  echo Error
+fi
