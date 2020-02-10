@@ -1,5 +1,5 @@
 #!/bin/sh
-# accepted parameters: $device $ssid $encryption $proto, optional $enable $key $mac
+# accepted parameters: $device $ssid $encryption $proto, optional $enable $key $mac $gateway
 # include POST/GET READER
 . /usr/share/cgi-bin/request
 echo "Content-Type: application/json; charset=utf-8"
@@ -81,12 +81,12 @@ if [ "$is_wireless" = "yes" ];
    then
     echo "{\"status\":\"1\",\"message\":\"No parameters\"}"
   fi
-  wired="$wired" switch="$switch" device="$device" ssid="$ssid" encryption="$encryption" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" key="$key" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_on.sh > /dev/null 2>&1
+  wired="$wired" switch="$switch" device="$device" ssid="$ssid" encryption="$encryption" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" key="$key" mac="$mac" gateway="$gateway" sudo -E /usr/share/cgi-bin/_ap_on.sh > /dev/null 2>&1
   result=$?
   CURR_WIRED=no
  else
   # not wireless, call _ap_off.sh
-  wired="$wired" switch="$switch" device="$device" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" mac="$mac" sudo -E /usr/share/cgi-bin/_ap_off.sh > /dev/null 2>&1
+  wired="$wired" switch="$switch" device="$device" proto="$proto" ipaddr="$ipaddr" netmask="$netmask" mac="$mac" gateway="$gateway" sudo -E /usr/share/cgi-bin/_ap_off.sh > /dev/null 2>&1
   result=$?
   CURR_WIRED=yes
 fi

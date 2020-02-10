@@ -18,22 +18,39 @@ if [ -n "$proto" ];
  then
   uci set network.wan.proto=$proto
 fi
+
+curr_gw=`uci get network.wan.gateway 2> /dev/null`
+if [ -n "$curr_gw" ];
+ then
+  uci del_list network.wan.dns=$curr_gw 2> /dev/null
+  uci del network.wan.gateway 2> /dev/null
+fi
+
 if [ "$proto" = "static" ];
  then
   uci set network.wan.ipaddr="$ipaddr"
   uci set network.wan.netmask="$netmask"
+  if [ -n "$gateway" ];
+   then
+    uci set network.wan.gateway="$gateway"
+    uci del_list network.wan.dns="$gateway"
+    uci add_list network.wan.dns="$gateway"
+  fi
 fi
+
 if [ "$proto" = "dhcp" ];
  then
   uci del network.wan.ipaddr 2> /dev/null
   uci del network.wan.netmask 2> /dev/null
 fi
+
 if [ -n "$mac" ];
  then
   uci set network.wan.mac="$mac"
  else
   uci del network.wan.mac 2> /dev/null
 fi
+
 #
 # remove setup wireless
 uci set wireless.wan.disabled=1
